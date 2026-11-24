@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root,
+[data-theme] {
+  --rounded-box: 0.375rem !important;
+  --rounded-btn: 0.375rem !important;
+  --rounded-badge: 0.25rem !important;
+  --tab-radius: 0.375rem !important;
+  --animation-btn: 0.12s !important;
+}
+
+html,
+body {
+  overflow-x: hidden;
+  min-height: 100%;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+/* Flatten overly puffy AI card radii across admin components into PrimeVue Aura 6px radius */
+.prime-admin-shell .rounded-2xl {
+  border-radius: 0.375rem !important;
+}
+
+.prime-admin-shell .rounded-xl {
+  border-radius: 0.375rem !important;
+}
+
+.prime-admin-shell .badge {
+  border-radius: 0.25rem !important;
+}
+
+/* Custom subtle scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(120, 113, 108, 0.35);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(120, 113, 108, 0.55);
+}

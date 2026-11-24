@@ -1,0 +1,144 @@
+version: "3.8"
+
+services:
+  presensi_app:
+    image: node:20-alpine
+    working_dir: /app
+    command: >
+      sh -c "
+      if [ ! -f client/dist/index.html ] || [ ! -d client/dist/models ]; then
+        rm -rf /tmp/client-build &&
+        cp -r /app/client /tmp/client-build &&
+        cd /tmp/client-build &&
+        rm -rf node_modules dist &&
+        npm install --include=dev &&
+        npm run build &&
+        mkdir -p /app/client/dist &&
+        cp -r /tmp/client-build/dist/. /app/client/dist/ &&
+        rm -rf /tmp/client-build;
+      fi &&
+      cd /app &&
+      if [ ! -d node_modules/mongoose ] || [ ! -d node_modules/pdfkit ]; then
+        npm install --omit=dev;
+      fi &&
+      npm start
+      "
+    stop_grace_period: 30s
+    environment:
+      TZ: "Asia/Jakarta"
+      NODE_ENV: "production"
+      PORT: "8080"
+      MONGODB_URI: "mongodb://admin:presensipass123@presensi_mongodb:27017/presensi_wajah?authSource=admin"
+      ALLOW_EMBEDDED_MONGO_FALLBACK: "false"
+      FACE_MATCH_THRESHOLD: "0.52"
+      AI_SERVICE_URL: "http://presensi_ai:8000"
+      SFACE_THRESHOLD: "0.38"
+    ports:
+      - target: 8080
+        published: 8090
+        protocol: tcp
+        mode: ingress
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - presensi_app_nfs:/app
+    networks:
+      - proxy-net
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname == ubuntu-swarm1
+      restart_policy:
+        condition: any
+
+  presensi_ai:
+    image: python:3.11-slim
+    working_dir: /app/ai_service
+    command: >
+      sh -c "
+      pip install --no-cache-dir -r /app/ai_service/requirements.txt &&
+      exec uvicorn app:app --host 0.0.0.0 --port 8000 --workers 1
+      "
+    stop_grace_period: 15s
+    environment:
+      TZ: "Asia/Jakarta"
+      SERVER_NODE_NAME: "ubuntu-swarm1"
+      SFACE_THRESHOLD: "0.38"
+      AI_MODEL_DIR: "/app/ai_service/models"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - presensi_app_nfs:/app
+    networks:
+      - proxy-net
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname == ubuntu-swarm1
+      restart_policy:
+        condition: any
+
+  presensi_mongodb:
+    image: public.ecr.aws/docker/library/mongo:4.4
+    stop_grace_period: 30s
+    environment:
+      TZ: "Asia/Jakarta"
+      MONGO_INITDB_ROOT_USERNAME: "admin"
+      MONGO_INITDB_ROOT_PASSWORD: "presensipass123"
+      MONGO_INITDB_DATABASE: "presensi_wajah"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - presensi_mongo_nfs:/data/db
+    networks:
+      - proxy-net
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname == ubuntu-swarm1
+      restart_policy:
+        condition: any
+
+  presensi_mongo_gui:
+    image: mongo-express:latest
+    stop_grace_period: 30s
+    environment:
+      TZ: "Asia/Jakarta"
+      ME_CONFIG_MONGODB_ADMINUSERNAME: "admin"
+      ME_CONFIG_MONGODB_ADMINPASSWORD: "presensipass123"
+      ME_CONFIG_MONGODB_URL: "mongodb://admin:presensipass123@presensi_mongodb:27017/"
+      ME_CONFIG_BASICAUTH_USERNAME: "riel"
+      ME_CONFIG_BASICAUTH_PASSWORD: "presensipass123"
+    ports:
+      - target: 8081
+        published: 8091
+        protocol: tcp
+        mode: ingress
+    networks:
+      - proxy-net
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname == ubuntu-swarm1
+      restart_policy:
+        condition: any
+
+networks:
+  proxy-net:
+    external: true
+
+volumes:
+  presensi_app_nfs:
+    driver: local
+    driver_opts:
+      type: "nfs"
+      o: "addr=192.168.200.2,nfsvers=4,rw,tcp,hard,timeo=600,retrans=2,noatime,nodiratime,rsize=1048576,wsize=1048576,actimeo=60"
+      device: ":/home/presensi-wajah/app"
+
+  presensi_mongo_nfs:
+    driver: local
+    driver_opts:
+      type: "nfs"
+      o: "addr=192.168.200.2,nfsvers=4,rw,tcp,hard,nolock,timeo=600,retrans=2,noatime,nodiratime,rsize=1048576,wsize=1048576"
+      device: ":/home/presensi-wajah/mongodb"
