@@ -53,24 +53,24 @@ export function SessionScheduleCard({
   return (
     <div className="w-full max-w-md overflow-hidden rounded-md border border-base-300 bg-base-100 shadow-sm">
       <div
-        className={`flex h-36 items-center justify-center border-b border-base-300 p-4 ${
+        className={`flex h-24 sm:h-36 items-center justify-center border-b border-base-300 p-3 sm:p-4 ${
           workspace === 'gereja' ? 'bg-white' : 'bg-black'
         }`}
       >
         <img
           src={workspace === 'gereja' ? '/assets/church.png' : '/assets/code.png'}
           alt={workspace === 'gereja' ? 'Gereja' : 'Piloting'}
-          className="max-h-28 w-auto object-contain"
+          className="max-h-18 sm:max-h-28 w-auto object-contain"
         />
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4 p-5">
+      <form onSubmit={handleSubmit} className="space-y-3.5 sm:space-y-4 p-4 sm:p-5">
         <div className="flex items-center justify-between gap-2">
-          <h2 className="text-base font-semibold text-base-content">
+          <h2 className="text-sm sm:text-base font-semibold text-base-content">
             {workspace === 'gereja' ? 'Jadwal Ibadah — Absensi Wajah' : 'Jadwal Scan — Piloting'}
           </h2>
           <span
-            className={`rounded border px-2 py-0.5 text-[11px] font-medium ${
+            className={`shrink-0 rounded border px-2 py-0.5 text-[11px] font-medium ${
               sessionLabel === 'Gereja Pagi'
                 ? 'border-sky-200 bg-sky-50 text-sky-700 dark:border-sky-800 dark:bg-sky-950/60 dark:text-sky-300'
                 : 'border-indigo-200 bg-indigo-50 text-indigo-700 dark:border-indigo-800 dark:bg-indigo-950/60 dark:text-indigo-300'
@@ -80,32 +80,32 @@ export function SessionScheduleCard({
           </span>
         </div>
 
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
           <label className="block space-y-1">
             <span className="flex items-center gap-1.5 text-xs font-medium text-base-content/75">
               <Calendar className="h-3.5 w-3.5" />
-              Tanggal Ibadah
+              Tanggal
             </span>
             <input
               type="date"
               required
               value={sessionDate}
               onChange={(e) => onChangeDate(e.target.value)}
-              className="h-9 w-full rounded-md border border-base-300 bg-base-100 px-2.5 text-xs font-medium text-base-content focus:border-emerald-600 focus:outline-none"
+              className="h-10 sm:h-9 w-full rounded-md border border-base-300 bg-base-100 px-2.5 text-xs font-medium text-base-content focus:border-emerald-600 focus:outline-none"
             />
           </label>
 
           <label className="block space-y-1">
             <span className="flex items-center gap-1.5 text-xs font-medium text-base-content/75">
               <Clock className="h-3.5 w-3.5" />
-              Jam Ibadah
+              Jam
             </span>
             <input
               type="time"
               required
               value={sessionTime}
               onChange={(e) => onChangeTime(e.target.value)}
-              className="h-9 w-full rounded-md border border-base-300 bg-base-100 px-2.5 text-xs font-medium text-base-content focus:border-emerald-600 focus:outline-none"
+              className="h-10 sm:h-9 w-full rounded-md border border-base-300 bg-base-100 px-2.5 text-xs font-medium text-base-content focus:border-emerald-600 focus:outline-none"
             />
           </label>
         </div>
@@ -117,7 +117,7 @@ export function SessionScheduleCard({
               key={preset}
               type="button"
               onClick={() => onChangeTime(preset)}
-              className={`rounded border px-2 py-0.5 text-[11px] font-medium transition ${
+              className={`rounded border px-2.5 py-1 sm:px-2 sm:py-0.5 text-xs sm:text-[11px] font-medium transition ${
                 sessionTime === preset
                   ? 'border-emerald-600 bg-emerald-600 text-white'
                   : 'border-base-300 bg-base-100 text-base-content hover:bg-base-200'
@@ -134,37 +134,39 @@ export function SessionScheduleCard({
           </p>
         )}
 
-        <div className="flex flex-wrap items-center gap-2 pt-1">
-          {onGoToPortal && (
-            <button
-              type="button"
-              onClick={onGoToPortal}
-              className="inline-flex h-9 items-center gap-1.5 rounded-md border border-base-300 bg-base-100 px-3 text-xs font-medium text-base-content hover:bg-base-200"
-            >
-              <ArrowLeft className="h-3.5 w-3.5" />
-              <span>Portal</span>
-            </button>
-          )}
-
+        <div className="flex flex-col gap-2 pt-1 sm:flex-row sm:items-center">
           <button
             type="submit"
             disabled={!canStart}
-            className="inline-flex h-9 flex-1 items-center justify-center gap-1.5 rounded-md bg-emerald-600 px-4 text-xs font-medium text-white hover:bg-emerald-700 disabled:opacity-50"
+            className="inline-flex h-11 sm:h-9 w-full sm:flex-1 items-center justify-center gap-1.5 rounded-md bg-emerald-600 px-4 text-xs font-semibold sm:font-medium text-white hover:bg-emerald-700 disabled:opacity-50 active:scale-[0.98]"
           >
-            <Camera className="h-3.5 w-3.5" />
+            <Camera className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
             <span>{engineReady ? 'Mulai Scan Wajah' : 'Menyiapkan Kamera AI...'}</span>
           </button>
 
-          {onGoToAdmin && (
-            <button
-              type="button"
-              onClick={onGoToAdmin}
-              className="inline-flex h-9 items-center gap-1.5 rounded-md border border-base-300 bg-base-100 px-3 text-xs font-medium text-base-content hover:bg-base-200"
-            >
-              <LayoutDashboard className="h-3.5 w-3.5" />
-              <span>Admin</span>
-            </button>
-          )}
+          <div className="grid grid-cols-2 gap-2 sm:flex sm:items-center">
+            {onGoToPortal && (
+              <button
+                type="button"
+                onClick={onGoToPortal}
+                className="inline-flex h-10 sm:h-9 items-center justify-center gap-1.5 rounded-md border border-base-300 bg-base-100 px-3 text-xs font-medium text-base-content hover:bg-base-200"
+              >
+                <ArrowLeft className="h-3.5 w-3.5" />
+                <span>Portal</span>
+              </button>
+            )}
+
+            {onGoToAdmin && (
+              <button
+                type="button"
+                onClick={onGoToAdmin}
+                className="inline-flex h-10 sm:h-9 items-center justify-center gap-1.5 rounded-md border border-base-300 bg-base-100 px-3 text-xs font-medium text-base-content hover:bg-base-200"
+              >
+                <LayoutDashboard className="h-3.5 w-3.5" />
+                <span>Admin</span>
+              </button>
+            )}
+          </div>
         </div>
       </form>
     </div>

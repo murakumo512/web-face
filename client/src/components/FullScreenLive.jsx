@@ -9,6 +9,7 @@ import {
   Footprints,
   LayoutDashboard,
   ShieldAlert,
+  SwitchCamera,
   UserPlus,
   Volume2,
   VolumeX,
@@ -674,9 +675,156 @@ export default function FullScreenLive({
         </div>
       )}
 
-      {/* PrimeVue Toolbar-style Top HUD (Shown during live scan) */}
+      {/* Mobile Compact Top HUD (Shown during live scan on phones) */}
       {cameraActive && (
-        <div className="pointer-events-none absolute inset-x-0 top-0 z-20 px-3 pt-[max(0.75rem,env(safe-area-inset-top))] sm:px-4">
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-20 p-2.5 sm:hidden">
+          <div className="pointer-events-auto flex items-center justify-between gap-2 rounded-lg border border-base-300/80 bg-base-100/90 px-2.5 py-2 text-xs text-base-content shadow-md backdrop-blur-md">
+            <div className="flex min-w-0 items-center gap-2">
+              {onGoToPortal && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    stopCamera();
+                    onGoToPortal();
+                  }}
+                  className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-base-300 bg-base-100 text-base-content active:scale-95"
+                  title="Kembali ke Portal"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                </button>
+              )}
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5 font-semibold leading-tight">
+                  <span className="h-2 w-2 shrink-0 rounded-full bg-emerald-500" />
+                  <span className="truncate">
+                    {skipSchedule ? 'Testing' : workspace === 'gereja' ? 'Gereja' : 'Piloting'}
+                  </span>
+                  {!skipSchedule && (
+                    <span className="text-[10px] font-medium text-base-content/60 tabular-nums">
+                      {clockLabel}
+                    </span>
+                  )}
+                </div>
+                <div className="mt-0.5 flex items-center gap-2 text-[11px] tabular-nums">
+                  <span className="text-base-content/75">
+                    Total <strong className="text-base-content">{summary.totalCount}</strong>
+                  </span>
+                  <span className="text-emerald-700 dark:text-emerald-400">
+                    Hadir <strong>{summary.registeredCount}</strong>
+                  </span>
+                  <span className="text-amber-700 dark:text-amber-400">
+                    Tamu <strong>{summary.unregisteredCount}</strong>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="shrink-0">
+              <AiEnginePill
+                aiMode={aiMode}
+                onSelectMode={setAiMode}
+                serverHealth={serverHealth}
+                useServerAi={useServerAi}
+                telemetry={telemetry}
+                compact
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Mobile Bottom Camera Controls Bar (Thumb-friendly) */}
+      {cameraActive && (
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 p-3 sm:hidden">
+          <div className="pointer-events-auto mx-auto flex max-w-md items-center justify-between gap-1.5 rounded-xl border border-base-300/80 bg-base-100/92 px-2.5 py-2 shadow-lg backdrop-blur-md">
+            <div className="flex items-center gap-1.5">
+              {devices.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const idx = devices.findIndex((d) => d.deviceId === selectedDeviceId);
+                    const nextDevice = devices[(idx + 1) % devices.length];
+                    if (nextDevice) {
+                      setSelectedDeviceId(nextDevice.deviceId);
+                      if (cameraActive) startCamera(nextDevice.deviceId);
+                    }
+                  }}
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-base-300 bg-base-100 text-base-content active:scale-95"
+                  title="Ganti Kamera (Depan/Belakang)"
+                >
+                  <SwitchCamera className="h-4 w-4" />
+                </button>
+              )}
+
+              <button
+                type="button"
+                onClick={() =>
+                  setMirrorCamera((prev) => {
+                    const next = !prev;
+                    try {
+                      localStorage.setItem('mardonius_camera_mirror', String(next));
+                    } catch {
+                      // ignore
+                    }
+                    return next;
+                  })
+                }
+                className={`inline-flex h-10 w-10 items-center justify-center rounded-lg border transition active:scale-95 ${
+                  mirrorCamera
+                    ? 'border-emerald-600 bg-emerald-600 text-white'
+                    : 'border-base-300 bg-base-100 text-base-content'
+                }`}
+                title="Flip / Mirror Kamera"
+              >
+                <FlipHorizontal2 className="h-4 w-4" />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setSoundEnabled((s) => !s)}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-base-300 bg-base-100 text-base-content active:scale-95"
+                title={soundEnabled ? 'Matikan suara' : 'Aktifkan suara'}
+              >
+                {soundEnabled ? (
+                  <Volume2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                ) : (
+                  <VolumeX className="h-4 w-4 text-base-content/40" />
+                )}
+              </button>
+            </div>
+
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => {
+                  userStoppedRef.current = true;
+                  stopCamera();
+                }}
+                className="inline-flex h-10 items-center gap-1.5 rounded-lg bg-rose-600 px-3.5 text-xs font-semibold text-white active:scale-95"
+              >
+                <CameraOff className="h-4 w-4" />
+                <span>Stop</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  stopCamera();
+                  onGoToAdmin?.();
+                }}
+                className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-base-300 bg-base-100 px-3 text-xs font-medium text-base-content active:scale-95"
+              >
+                <LayoutDashboard className="h-4 w-4" />
+                <span>Admin</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Desktop / Tablet Toolbar-style Top HUD (Shown during live scan) */}
+      {cameraActive && (
+        <div className="pointer-events-none hidden sm:block absolute inset-x-0 top-0 z-20 px-4 pt-3">
         <div className="pointer-events-auto mx-auto flex flex-wrap items-center justify-between gap-2 rounded-md border border-base-300 bg-base-100/95 px-2.5 py-1.5 text-xs text-base-content shadow-sm backdrop-blur-sm">
           {/* Left: Status, Time Session & Counters */}
           <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
@@ -835,7 +983,7 @@ export default function FullScreenLive({
       {/* PrimeVue Toast Notification */}
       {toast && (
         <div
-          className={`absolute left-1/2 top-24 z-30 flex w-[92%] max-w-md -translate-x-1/2 items-center justify-center gap-2 rounded-md border px-3.5 py-2 text-xs font-medium shadow-md sm:w-auto sm:text-sm lg:top-16 ${
+          className={`absolute left-1/2 top-16 z-30 flex w-[92%] max-w-md -translate-x-1/2 items-center justify-center gap-2 rounded-md border px-3.5 py-2 text-xs font-medium shadow-md sm:top-16 sm:w-auto sm:text-sm ${
             toast.type === 'success'
               ? 'border-emerald-300 bg-base-100 text-emerald-700 dark:border-emerald-700 dark:text-emerald-300'
               : 'border-amber-300 bg-base-100 text-amber-700 dark:border-amber-700 dark:text-amber-300'
@@ -852,7 +1000,7 @@ export default function FullScreenLive({
 
       {/* PrimeVue Panel Bottom Bar when Unknown Face Detected */}
       {unknownAlert && (
-        <div className="absolute bottom-[max(1rem,env(safe-area-inset-bottom))] left-1/2 z-30 flex w-[94%] max-w-xl -translate-x-1/2 flex-wrap items-center justify-between gap-2.5 rounded-md border border-amber-300 bg-base-100 px-3.5 py-2.5 shadow-lg dark:border-amber-700 sm:px-4">
+        <div className="absolute bottom-20 sm:bottom-4 left-1/2 z-30 flex w-[94%] max-w-xl -translate-x-1/2 flex-wrap items-center justify-between gap-2.5 rounded-lg border border-amber-300 bg-base-100/95 px-3.5 py-2.5 shadow-lg backdrop-blur-md dark:border-amber-700 sm:px-4">
           <div className="flex items-center gap-3">
             {unknownAlert.snapshotBase64 ? (
               <img

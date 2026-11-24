@@ -15,7 +15,18 @@ html,
 body {
   overflow-x: hidden;
   min-height: 100%;
+  overscroll-behavior-y: contain;
+  -webkit-tap-highlight-color: transparent;
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+/* Hide scrollbars for horizontal mobile action strips */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 /* Flatten overly puffy AI card radii across admin components into PrimeVue Aura 6px radius */

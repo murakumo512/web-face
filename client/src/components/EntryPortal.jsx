@@ -62,10 +62,10 @@ export default function EntryPortal({ navigate }) {
   ];
 
   return (
-    <div className="min-h-screen bg-base-200 text-base-content flex flex-col">
+    <div className="min-h-[100dvh] bg-base-200 text-base-content flex flex-col">
       {/* PrimeVue-inspired Minimal Header */}
-      <header className="border-b border-base-300 bg-base-100">
-        <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4 sm:px-6">
+      <header className="sticky top-0 z-20 border-b border-base-300 bg-base-100/95 backdrop-blur-sm">
+        <div className="mx-auto flex h-13 sm:h-14 max-w-5xl items-center justify-between px-3.5 sm:px-6">
           <span className="text-sm font-semibold tracking-tight text-base-content">
             {portalTitle}
           </span>
@@ -73,7 +73,7 @@ export default function EntryPortal({ navigate }) {
           <button
             type="button"
             onClick={() => navigate('/admin')}
-            className="inline-flex items-center gap-1.5 rounded-md border border-base-300 bg-base-100 px-3 py-1.5 text-xs font-medium text-base-content transition hover:bg-base-200"
+            className="inline-flex h-9 items-center gap-1.5 rounded-md border border-base-300 bg-base-100 px-3 text-xs font-medium text-base-content transition hover:bg-base-200 active:scale-[0.98]"
           >
             <LayoutDashboard className="h-3.5 w-3.5" />
             <span>Admin</span>
@@ -82,14 +82,14 @@ export default function EntryPortal({ navigate }) {
       </header>
 
       {/* Main Content */}
-      <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col justify-center px-4 py-10 sm:px-6">
-        <div className="mb-6">
-          <h1 className="text-xl font-semibold tracking-tight text-base-content sm:text-2xl">
+      <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col justify-start sm:justify-center px-3.5 py-5 sm:px-6 sm:py-10">
+        <div className="mb-4 sm:mb-6">
+          <h1 className="text-lg font-semibold tracking-tight text-base-content sm:text-2xl">
             {portalHeading}
           </h1>
         </div>
 
-        <section className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3">
+        <section className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 sm:gap-5 md:grid-cols-3">
           {cards.map((card) => (
             <div
               key={card.key}
@@ -99,15 +99,19 @@ export default function EntryPortal({ navigate }) {
               <button
                 type="button"
                 onClick={() => navigate(card.livePath)}
-                className={`flex h-48 w-full cursor-pointer items-center justify-center border-b border-base-300 p-4 transition hover:opacity-95 ${card.stageClass}`}
+                className={`flex h-28 sm:h-44 w-full cursor-pointer items-center justify-center border-b border-base-300 p-3 sm:p-4 transition hover:opacity-95 ${card.stageClass}`}
                 title={`Buka ${card.title}`}
               >
                 {card.imageSrc ? (
-                  <img src={card.imageSrc} alt={card.imageAlt} className={card.imgClass} />
+                  <img
+                    src={card.imageSrc}
+                    alt={card.imageAlt}
+                    className="max-h-20 sm:max-h-36 w-auto object-contain"
+                  />
                 ) : (
-                  <div className="flex flex-col items-center justify-center gap-2 text-center">
-                    <ScanFace className="h-12 w-12 text-emerald-400" strokeWidth={1.6} />
-                    <span className="font-mono text-xs tracking-widest text-zinc-400">
+                  <div className="flex flex-col items-center justify-center gap-1.5 sm:gap-2 text-center">
+                    <ScanFace className="h-9 w-9 sm:h-12 sm:w-12 text-emerald-400" strokeWidth={1.6} />
+                    <span className="font-mono text-[11px] sm:text-xs tracking-widest text-zinc-400">
                       LIVE TEST
                     </span>
                   </div>
@@ -115,14 +119,14 @@ export default function EntryPortal({ navigate }) {
               </button>
 
               {/* PrimeVue Card Body & Footer */}
-              <div className="flex flex-1 flex-col justify-between gap-4 p-4">
-                <h2 className="text-base font-semibold text-base-content">{card.title}</h2>
+              <div className="flex flex-1 flex-col justify-between gap-3 sm:gap-4 p-3.5 sm:p-4">
+                <h2 className="text-sm sm:text-base font-semibold text-base-content">{card.title}</h2>
 
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
                     onClick={() => navigate(card.livePath)}
-                    className="inline-flex h-9 items-center justify-center gap-1.5 rounded-md bg-emerald-600 px-3 text-xs font-medium text-white transition hover:bg-emerald-700"
+                    className="inline-flex h-10 sm:h-9 items-center justify-center gap-1.5 rounded-md bg-emerald-600 px-3 text-xs font-medium text-white transition hover:bg-emerald-700 active:scale-[0.98]"
                   >
                     <Camera className="h-3.5 w-3.5 shrink-0" />
                     <span className="truncate">{card.primaryLabel}</span>
@@ -130,7 +134,7 @@ export default function EntryPortal({ navigate }) {
                   <button
                     type="button"
                     onClick={() => navigate(card.registerPath)}
-                    className="inline-flex h-9 items-center justify-center gap-1.5 rounded-md border border-base-300 bg-base-100 px-3 text-xs font-medium text-base-content transition hover:bg-base-200"
+                    className="inline-flex h-10 sm:h-9 items-center justify-center gap-1.5 rounded-md border border-base-300 bg-base-100 px-3 text-xs font-medium text-base-content transition hover:bg-base-200 active:scale-[0.98]"
                   >
                     <UserPlus className="h-3.5 w-3.5 shrink-0" />
                     <span>Registrasi</span>
