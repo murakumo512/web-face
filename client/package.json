@@ -7,15 +7,20 @@
     "dev": "vite",
     "prebuild": "mkdir -p public/models && cp node_modules/@vladmandic/face-api/model/ssd_mobilenetv1_model* node_modules/@vladmandic/face-api/model/tiny_face_detector_model* node_modules/@vladmandic/face-api/model/face_landmark_68_model* node_modules/@vladmandic/face-api/model/face_recognition_model* public/models/",
     "build": "vite build",
+    "build:android": "npm run prebuild && vite build --mode android && npx cap sync android",
+    "apk": "npm run build:android && cd android && ./gradlew assembleDebug",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@capacitor/android": "^8.6.2",
+    "@capacitor/core": "^8.6.2",
     "@vladmandic/face-api": "^1.7.15",
     "lucide-react": "^0.469.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.6.2",
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.20",
     "daisyui": "^4.12.23",

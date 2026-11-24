@@ -1,0 +1,11 @@
+{
+  "appId": "id.my.labjaringanukdw.wajah",
+  "appName": "Presensi Wajah",
+  "webDir": "dist",
+  "android": {
+    "allowMixedContent": false
+  },
+  "server": {
+    "androidScheme": "https"
+  }
+}

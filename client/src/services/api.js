@@ -1,4 +1,5 @@
-const API_BASE = '/api';
+// Web: relative '/api' (same origin). Android app (Capacitor): absolute URL from .env.android
+const API_BASE = (import.meta.env.VITE_API_BASE || '/api').replace(/\/+$/, '');
 const TOKEN_STORAGE_KEY = 'mardonius_admin_token';
 
 export function getStoredAdminToken() {
