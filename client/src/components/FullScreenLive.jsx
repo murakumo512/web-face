@@ -611,7 +611,7 @@ export default function FullScreenLive({
 
       {/* Schedule Input Prompt before Scanning (or simple quick-resume box in Testing mode) */}
       {!cameraActive && (
-        <div className="absolute inset-0 z-10 flex items-center justify-center bg-base-200 px-4 py-6">
+        <div className="absolute inset-0 z-10 flex items-start justify-center overflow-y-auto bg-base-200 px-4 py-6 sm:items-center">
           {skipSchedule ? (
             <div className="w-full max-w-sm rounded-md border border-base-300 bg-base-100 p-5 text-center shadow-sm">
               <h2 className="text-base font-semibold text-base-content">Kamera Testing Siap</h2>

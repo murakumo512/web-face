@@ -13,9 +13,10 @@
 
 html,
 body {
-  overflow-x: hidden;
+  overflow-x: clip;
+  height: auto;
   min-height: 100%;
-  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
   -webkit-tap-highlight-color: transparent;
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
 }
