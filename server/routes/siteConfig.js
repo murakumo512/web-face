@@ -115,6 +115,18 @@ function sanitizePublicConfig(doc) {
           ? plain.workspaces.piloting.highlights
           : defaults.workspaces.piloting.highlights,
       },
+      testing: {
+        ...defaults.workspaces.testing,
+        ...(plain.workspaces?.testing || {}),
+        roleOptions:
+          Array.isArray(plain.workspaces?.testing?.roleOptions) &&
+          plain.workspaces.testing.roleOptions.length > 0
+            ? plain.workspaces.testing.roleOptions
+            : defaults.workspaces.testing.roleOptions,
+        highlights: Array.isArray(plain.workspaces?.testing?.highlights)
+          ? plain.workspaces.testing.highlights
+          : defaults.workspaces.testing.highlights,
+      },
     },
     customSections: Array.isArray(plain.customSections)
       ? [...plain.customSections].sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
@@ -342,7 +354,9 @@ router.post('/role-options', async (req, res) => {
       }
     }
 
-    const ws = req.body?.workspace === 'gereja' ? 'gereja' : 'piloting';
+    const ws = ['gereja', 'piloting', 'testing'].includes(req.body?.workspace)
+      ? req.body.workspace
+      : 'piloting';
     const action = req.body?.action === 'delete' ? 'delete' : 'add';
     const roleName = String(req.body?.role || '').trim();
     if (!roleName) {
@@ -465,11 +479,15 @@ router.put('/', async (req, res) => {
           ...base.workspaces.piloting,
           ...(incoming.workspaces?.piloting || {}),
         },
+        testing: {
+          ...base.workspaces.testing,
+          ...(incoming.workspaces?.testing || {}),
+        },
       },
       customSections: Array.isArray(incoming.customSections)
         ? incoming.customSections.map((sec, idx) => ({
             id: String(sec.id || `sec-${Date.now()}-${idx}`),
-            target: ['portal', 'gereja', 'piloting'].includes(sec.target) ? sec.target : 'portal',
+            target: ['portal', 'gereja', 'piloting', 'testing'].includes(sec.target) ? sec.target : 'portal',
             layout: ['info', 'announcement', 'stats', 'checklist'].includes(sec.layout)
               ? sec.layout
               : 'info',

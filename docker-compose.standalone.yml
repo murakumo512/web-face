@@ -1,0 +1,102 @@
+services:
+  presensi_app:
+    image: node:20-alpine
+    container_name: presensi_app
+    working_dir: /app
+    restart: unless-stopped
+    command: >
+      sh -c "
+      if [ ! -f client/dist/index.html ] || [ ! -d client/dist/models ]; then
+        rm -rf /tmp/client-build &&
+        cp -r /app/client /tmp/client-build &&
+        cd /tmp/client-build &&
+        rm -rf node_modules dist &&
+        npm install --include=dev &&
+        npm run build &&
+        mkdir -p /app/client/dist &&
+        cp -r /tmp/client-build/dist/. /app/client/dist/ &&
+        rm -rf /tmp/client-build;
+      fi &&
+      cd /app &&
+      if [ ! -d node_modules/mongoose ] || [ ! -d node_modules/pdfkit ]; then
+        npm install --omit=dev;
+      fi &&
+      npm start
+      "
+    environment:
+      TZ: "Asia/Jakarta"
+      NODE_ENV: "production"
+      PORT: "8080"
+      MONGODB_URI: "mongodb://admin:presensipass123@presensi_mongodb:27017/presensi_wajah?authSource=admin"
+      ALLOW_EMBEDDED_MONGO_FALLBACK: "false"
+      FACE_MATCH_THRESHOLD: "0.52"
+      AI_SERVICE_URL: "http://presensi_ai:8000"
+      SFACE_THRESHOLD: "0.38"
+    ports:
+      - "8090:8080"
+    volumes:
+      - ./:/app
+    depends_on:
+      - presensi_mongodb
+      - presensi_ai
+    networks:
+      - presensi_net
+
+  presensi_ai:
+    image: python:3.11-slim
+    container_name: presensi_ai
+    working_dir: /app/ai_service
+    restart: unless-stopped
+    command: >
+      sh -c "
+      pip install --no-cache-dir -r /app/ai_service/requirements.txt &&
+      exec uvicorn app:app --host 0.0.0.0 --port 8000 --workers 1
+      "
+    environment:
+      TZ: "Asia/Jakarta"
+      SERVER_NODE_NAME: "standalone-server"
+      SFACE_THRESHOLD: "0.38"
+      AI_MODEL_DIR: "/app/ai_service/models"
+    volumes:
+      - ./:/app
+    networks:
+      - presensi_net
+
+  presensi_mongodb:
+    image: mongo:4.4
+    container_name: presensi_mongodb
+    restart: unless-stopped
+    environment:
+      TZ: "Asia/Jakarta"
+      MONGO_INITDB_ROOT_USERNAME: "admin"
+      MONGO_INITDB_ROOT_PASSWORD: "presensipass123"
+      MONGO_INITDB_DATABASE: "presensi_wajah"
+    volumes:
+      - presensi_mongo_data:/data/db
+    networks:
+      - presensi_net
+
+  presensi_mongo_gui:
+    image: mongo-express:latest
+    container_name: presensi_mongo_gui
+    restart: unless-stopped
+    environment:
+      TZ: "Asia/Jakarta"
+      ME_CONFIG_MONGODB_ADMINUSERNAME: "admin"
+      ME_CONFIG_MONGODB_ADMINPASSWORD: "presensipass123"
+      ME_CONFIG_MONGODB_URL: "mongodb://admin:presensipass123@presensi_mongodb:27017/"
+      ME_CONFIG_BASICAUTH_USERNAME: "riel"
+      ME_CONFIG_BASICAUTH_PASSWORD: "presensipass123"
+    ports:
+      - "8091:8081"
+    depends_on:
+      - presensi_mongodb
+    networks:
+      - presensi_net
+
+networks:
+  presensi_net:
+    driver: bridge
+
+volumes:
+  presensi_mongo_data:

@@ -1,5 +1,6 @@
 import React from 'react';
 import { ArrowLeft, Calendar, Camera, Clock, LayoutDashboard } from 'lucide-react';
+import { WorkspaceIcon } from './BrandLogo.jsx';
 
 export function getNowTimeHHMM() {
   const now = new Date();
@@ -51,38 +52,30 @@ export function SessionScheduleCard({
   };
 
   return (
-    <div className="w-full max-w-md overflow-hidden rounded-md border border-base-300 bg-base-100 shadow-sm">
-      <div
-        className={`flex h-24 sm:h-36 items-center justify-center border-b border-base-300 p-3 sm:p-4 ${
-          workspace === 'gereja' ? 'bg-white' : 'bg-black'
-        }`}
-      >
-        <img
-          src={workspace === 'gereja' ? '/assets/church.png' : '/assets/code.png'}
-          alt={workspace === 'gereja' ? 'Gereja' : 'Piloting'}
-          className="max-h-18 sm:max-h-28 w-auto object-contain"
-        />
-      </div>
-
-      <form onSubmit={handleSubmit} className="space-y-3.5 sm:space-y-4 p-4 sm:p-5">
-        <div className="flex items-center justify-between gap-2">
-          <h2 className="text-sm sm:text-base font-semibold text-base-content">
-            {workspace === 'gereja' ? 'Jadwal Ibadah — Absensi Wajah' : 'Jadwal Scan — Piloting'}
-          </h2>
-          <span
-            className={`shrink-0 rounded border px-2 py-0.5 text-[11px] font-medium ${
-              sessionLabel === 'Gereja Pagi'
-                ? 'border-sky-200 bg-sky-50 text-sky-700 dark:border-sky-800 dark:bg-sky-950/60 dark:text-sky-300'
-                : 'border-indigo-200 bg-indigo-50 text-indigo-700 dark:border-indigo-800 dark:bg-indigo-950/60 dark:text-indigo-300'
-            }`}
-          >
+    <div className="card w-full max-w-md overflow-hidden border border-base-300 bg-base-100">
+      <form onSubmit={handleSubmit} className="card-body gap-4 p-5">
+        <div className="flex items-center justify-between gap-2 border-b border-base-300 pb-3.5">
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-box border border-base-300 bg-base-200 text-primary">
+              <WorkspaceIcon workspace={workspace} className="h-4 w-4" />
+            </div>
+            <div>
+              <h2 className="text-sm sm:text-base font-semibold text-base-content leading-tight">
+                {workspace === 'gereja' ? 'Jadwal Ibadah' : 'Jadwal Scan'}
+              </h2>
+              <p className="text-[11px] text-base-content/60">
+                {workspace === 'gereja' ? 'Ruang Gereja' : workspace === 'testing' ? 'Testing' : 'Piloting'}
+              </p>
+            </div>
+          </div>
+          <span className="badge badge-outline badge-sm font-medium shrink-0">
             {sessionLabel}
           </span>
         </div>
 
         <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
-          <label className="block space-y-1">
-            <span className="flex items-center gap-1.5 text-xs font-medium text-base-content/75">
+          <label className="form-control">
+            <span className="label-text mb-1 flex items-center gap-1.5 text-xs font-medium">
               <Calendar className="h-3.5 w-3.5" />
               Tanggal
             </span>
@@ -91,12 +84,12 @@ export function SessionScheduleCard({
               required
               value={sessionDate}
               onChange={(e) => onChangeDate(e.target.value)}
-              className="h-10 sm:h-9 w-full rounded-md border border-base-300 bg-base-100 px-2.5 text-xs font-medium text-base-content focus:border-emerald-600 focus:outline-none"
+              className="input input-bordered input-sm h-10 sm:h-9 w-full text-xs"
             />
           </label>
 
-          <label className="block space-y-1">
-            <span className="flex items-center gap-1.5 text-xs font-medium text-base-content/75">
+          <label className="form-control">
+            <span className="label-text mb-1 flex items-center gap-1.5 text-xs font-medium">
               <Clock className="h-3.5 w-3.5" />
               Jam
             </span>
@@ -105,22 +98,20 @@ export function SessionScheduleCard({
               required
               value={sessionTime}
               onChange={(e) => onChangeTime(e.target.value)}
-              className="h-10 sm:h-9 w-full rounded-md border border-base-300 bg-base-100 px-2.5 text-xs font-medium text-base-content focus:border-emerald-600 focus:outline-none"
+              className="input input-bordered input-sm h-10 sm:h-9 w-full text-xs"
             />
           </label>
         </div>
 
         <div className="flex flex-wrap items-center gap-1.5">
-          <span className="text-[11px] text-base-content/60">Jam cepat:</span>
+          <span className="text-xs text-base-content/60">Jam:</span>
           {TIME_PRESETS.map((preset) => (
             <button
               key={preset}
               type="button"
               onClick={() => onChangeTime(preset)}
-              className={`rounded border px-2.5 py-1 sm:px-2 sm:py-0.5 text-xs sm:text-[11px] font-medium transition ${
-                sessionTime === preset
-                  ? 'border-emerald-600 bg-emerald-600 text-white'
-                  : 'border-base-300 bg-base-100 text-base-content hover:bg-base-200'
+              className={`btn btn-xs ${
+                sessionTime === preset ? 'btn-primary' : 'btn-ghost border border-base-300'
               }`}
             >
               {preset}
@@ -129,19 +120,19 @@ export function SessionScheduleCard({
         </div>
 
         {cameraError && (
-          <p className="rounded-md border border-rose-300 bg-rose-50 px-3 py-2 text-xs text-rose-700 dark:border-rose-800 dark:bg-rose-950/60 dark:text-rose-300">
-            {cameraError}
-          </p>
+          <div className="alert alert-error py-2 text-xs">
+            <span>{cameraError}</span>
+          </div>
         )}
 
         <div className="flex flex-col gap-2 pt-1 sm:flex-row sm:items-center">
           <button
             type="submit"
             disabled={!canStart}
-            className="inline-flex h-11 sm:h-9 w-full sm:flex-1 items-center justify-center gap-1.5 rounded-md bg-emerald-600 px-4 text-xs font-semibold sm:font-medium text-white hover:bg-emerald-700 disabled:opacity-50 active:scale-[0.98]"
+            className="btn btn-primary h-11 sm:h-9 sm:btn-sm w-full sm:flex-1 gap-1.5"
           >
             <Camera className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
-            <span>{engineReady ? 'Mulai Scan Wajah' : 'Menyiapkan Kamera AI...'}</span>
+            <span>{engineReady ? 'Buka Kamera' : 'Menyiapkan Kamera...'}</span>
           </button>
 
           <div className="grid grid-cols-2 gap-2 sm:flex sm:items-center">
@@ -149,10 +140,10 @@ export function SessionScheduleCard({
               <button
                 type="button"
                 onClick={onGoToPortal}
-                className="inline-flex h-10 sm:h-9 items-center justify-center gap-1.5 rounded-md border border-base-300 bg-base-100 px-3 text-xs font-medium text-base-content hover:bg-base-200"
+                className="btn btn-ghost border border-base-300 h-10 sm:h-9 sm:btn-sm gap-1.5 font-normal"
               >
                 <ArrowLeft className="h-3.5 w-3.5" />
-                <span>Portal</span>
+                <span>Kembali</span>
               </button>
             )}
 
@@ -160,7 +151,7 @@ export function SessionScheduleCard({
               <button
                 type="button"
                 onClick={onGoToAdmin}
-                className="inline-flex h-10 sm:h-9 items-center justify-center gap-1.5 rounded-md border border-base-300 bg-base-100 px-3 text-xs font-medium text-base-content hover:bg-base-200"
+                className="btn btn-ghost border border-base-300 h-10 sm:h-9 sm:btn-sm gap-1.5 font-normal"
               >
                 <LayoutDashboard className="h-3.5 w-3.5" />
                 <span>Admin</span>
@@ -186,8 +177,8 @@ export function SessionScheduleBar({
 }) {
   const sessionLabel = getSessionLabelFromTime(sessionTime);
   return (
-    <div className="flex flex-wrap items-center gap-2 rounded-md border border-base-300 bg-base-100 px-3 py-2 text-xs shadow-sm">
-      <span className="font-semibold text-base-content">Jadwal Ibadah:</span>
+    <div className="flex flex-wrap items-center gap-2 rounded-box border border-base-300 bg-base-100 px-3 py-2 text-xs">
+      <span className="font-semibold text-base-content">Jadwal:</span>
       <label className="inline-flex items-center gap-1.5">
         <Calendar className="h-3.5 w-3.5 text-base-content/60" />
         <input
@@ -196,7 +187,7 @@ export function SessionScheduleBar({
           disabled={disabled}
           value={sessionDate}
           onChange={(e) => onChangeDate(e.target.value)}
-          className="h-8 rounded-md border border-base-300 bg-base-100 px-2 text-xs text-base-content disabled:opacity-60"
+          className="input input-bordered input-xs text-xs disabled:opacity-60"
         />
       </label>
       <label className="inline-flex items-center gap-1.5">
@@ -207,16 +198,10 @@ export function SessionScheduleBar({
           disabled={disabled}
           value={sessionTime}
           onChange={(e) => onChangeTime(e.target.value)}
-          className="h-8 rounded-md border border-base-300 bg-base-100 px-2 text-xs text-base-content disabled:opacity-60"
+          className="input input-bordered input-xs text-xs disabled:opacity-60"
         />
       </label>
-      <span
-        className={`rounded border px-2 py-0.5 text-[11px] font-medium ${
-          sessionLabel === 'Gereja Pagi'
-            ? 'border-sky-200 bg-sky-50 text-sky-700 dark:border-sky-800 dark:bg-sky-950/60 dark:text-sky-300'
-            : 'border-indigo-200 bg-indigo-50 text-indigo-700 dark:border-indigo-800 dark:bg-indigo-950/60 dark:text-indigo-300'
-        }`}
-      >
+      <span className="badge badge-outline badge-sm font-medium">
         {sessionLabel}
       </span>
       {disabled && (

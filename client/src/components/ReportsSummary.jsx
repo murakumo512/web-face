@@ -198,332 +198,337 @@ export default function ReportsSummary({ workspace = 'piloting', readOnly = fals
       : 0;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Top Filter & Export Bar */}
-      <div className="space-y-3 rounded-2xl border border-stone-200 bg-white p-3.5 shadow-sm dark:border-stone-800 dark:bg-[#1C1917] dark:shadow-none sm:p-4">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex flex-wrap items-center gap-2">
-            <label className="flex flex-1 items-center gap-2 rounded-xl border border-stone-300 bg-stone-50 px-3 py-2 text-xs dark:border-stone-700 dark:bg-stone-950 sm:flex-none">
-              <Calendar className="h-4 w-4 shrink-0 text-sky-600 dark:text-sky-400" />
-              <span className="font-semibold text-base-content/75">Tgl:</span>
-              <input
-                type="date"
-                value={selectedDate}
-                onChange={(e) => {
-                  setSelectedDate(e.target.value);
-                  setManualDate(e.target.value);
-                }}
-                className="w-full bg-transparent text-xs font-medium text-stone-900 focus:outline-none dark:text-white sm:text-sm"
-              />
-            </label>
+      <div className="card border border-base-300 bg-base-100">
+        <div className="card-body gap-3 p-4">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex flex-wrap items-center gap-2">
+              <label className="flex flex-1 items-center gap-2 rounded-box border border-base-300 bg-base-100 px-3 py-1.5 text-xs sm:flex-none">
+                <Calendar className="h-3.5 w-3.5 shrink-0 text-primary" />
+                <span className="font-medium text-base-content/75">Tgl:</span>
+                <input
+                  type="date"
+                  value={selectedDate}
+                  onChange={(e) => {
+                    setSelectedDate(e.target.value);
+                    setManualDate(e.target.value);
+                  }}
+                  className="w-full bg-transparent text-xs font-medium text-base-content focus:outline-none sm:text-sm"
+                />
+              </label>
 
-            <button
-              type="button"
-              onClick={() => {
-                const today = getTodayDateKey();
-                setSelectedDate(today);
-                setManualDate(today);
-              }}
-              className="btn btn-sm btn-ghost border border-base-300 font-medium"
-            >
-              Hari Ini
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                loadReports();
-                loadPeriodReport();
-              }}
-              className="btn btn-sm btn-ghost border border-base-300 font-medium gap-1.5"
-            >
-              <RefreshCw className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} />
-              <span>Refresh</span>
-            </button>
-
-            {!readOnly && (
               <button
                 type="button"
                 onClick={() => {
-                  setShowManualForm((v) => !v);
-                  setManualDate(selectedDate);
-                  setManualMsg(null);
+                  const today = getTodayDateKey();
+                  setSelectedDate(today);
+                  setManualDate(today);
                 }}
-                className="btn btn-sm btn-outline btn-success font-medium gap-1.5 w-full sm:w-auto"
+                className="btn btn-sm btn-ghost border border-base-300 font-normal"
               >
-                <PlusCircle className="h-3.5 w-3.5" />
-                <span>Input Absensi Manual</span>
+                Hari Ini
               </button>
-            )}
-          </div>
 
-          <div className="grid grid-cols-2 gap-1.5 sm:flex sm:flex-wrap sm:items-center sm:gap-2">
-            <a
-              href={api.getExportCsvUrl(selectedDate, 'summary', workspace)}
-              download
-              className="btn btn-sm btn-outline btn-success gap-1.5 shadow-none font-medium"
-            >
-              <Download className="h-3.5 w-3.5" />
-              Summary (.csv)
-            </a>
-            <a
-              href={api.getExportCsvUrl(selectedDate, 'logs', workspace)}
-              download
-              className="btn btn-sm btn-ghost border border-base-300 gap-1.5 shadow-none font-medium"
-            >
-              <Download className="h-3.5 w-3.5" />
-              Log (.csv)
-            </a>
-            <a
-              href={api.getExportPdfUrl(selectedDate, 'summary', workspace)}
-              download
-              className="btn btn-sm btn-outline btn-error gap-1.5 shadow-none font-medium"
-            >
-              <FileText className="h-3.5 w-3.5" />
-              Summary (.pdf)
-            </a>
-            <a
-              href={api.getExportPdfUrl(selectedDate, 'logs', workspace)}
-              download
-              className="btn btn-sm btn-ghost border border-base-300 gap-1.5 shadow-none font-medium"
-            >
-              <FileText className="h-3.5 w-3.5" />
-              Log (.pdf)
-            </a>
-            <a
-              href={api.getExportPdfUrl(selectedDate, 'all', workspace)}
-              download
-              className="col-span-2 sm:col-span-1 btn btn-sm btn-primary gap-1.5 shadow-sm font-medium"
-            >
-              <FileText className="h-3.5 w-3.5" />
-              Lengkap (.pdf)
-            </a>
-          </div>
-        </div>
-
-        {/* Manual Attendance Form by Date */}
-        {showManualForm && (
-          <form
-            onSubmit={handleManualAttendanceSubmit}
-            className="mt-3 grid gap-3 rounded-xl border border-stone-200 bg-stone-50 p-3.5 dark:border-stone-800 dark:bg-stone-950/70 sm:grid-cols-4"
-          >
-            <div>
-              <label className="mb-1 block text-[11px] font-semibold text-stone-600 dark:text-stone-400">
-                Pilih Anggota
-              </label>
-              <select
-                value={manualUserId}
-                onChange={(e) => setManualUserId(e.target.value)}
-                required
-                className="w-full rounded-xl border border-base-300 bg-base-100 px-3 py-2 text-xs text-stone-900 focus:border-[#7C2D12] focus:outline-none dark:border-stone-700 dark:bg-stone-900 dark:text-white"
-              >
-                {(summary.memberAttendance || []).map((m) => (
-                  <option key={m.userId} value={String(m.userId)}>
-                    {m.personName} ({m.identifier})
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <label className="mb-1 block text-[11px] font-semibold text-stone-600 dark:text-stone-400">
-                  Tgl Absensi
-                </label>
-                <input
-                  type="date"
-                  value={manualDate}
-                  onChange={(e) => setManualDate(e.target.value)}
-                  required
-                  className="w-full rounded-md border border-base-300 bg-base-100 px-2.5 py-2 text-xs text-stone-900 focus:border-emerald-600 focus:outline-none dark:text-white"
-                />
-              </div>
-              <div>
-                <label className="mb-1 block text-[11px] font-semibold text-stone-600 dark:text-stone-400">
-                  Jam ({getSessionLabelFromTime(manualTime)})
-                </label>
-                <input
-                  type="time"
-                  value={manualTime}
-                  onChange={(e) => setManualTime(e.target.value)}
-                  required
-                  className="w-full rounded-md border border-base-300 bg-base-100 px-2.5 py-2 text-xs text-stone-900 focus:border-emerald-600 focus:outline-none dark:text-white"
-                />
-              </div>
-            </div>
-            <div>
-              <label className="mb-1 block text-[11px] font-semibold text-stone-600 dark:text-stone-400">
-                Catatan
-              </label>
-              <input
-                type="text"
-                value={manualNote}
-                onChange={(e) => setManualNote(e.target.value)}
-                placeholder="Catatan absensi..."
-                className="w-full rounded-xl border border-base-300 bg-base-100 px-3 py-2 text-xs text-stone-900 focus:border-[#7C2D12] focus:outline-none dark:border-stone-700 dark:bg-stone-900 dark:text-white"
-              />
-            </div>
-            <div className="flex items-end gap-2">
               <button
-                type="submit"
-                disabled={manualSaving || !manualUserId}
-                className="inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-emerald-600 px-3 py-2 text-xs font-bold text-white hover:bg-emerald-500 disabled:opacity-50 dark:bg-emerald-500 dark:text-stone-950 dark:hover:bg-emerald-400"
+                type="button"
+                onClick={() => {
+                  loadReports();
+                  loadPeriodReport();
+                }}
+                className="btn btn-sm btn-ghost border border-base-300 font-normal gap-1.5"
               >
-                <CheckCircle2 className="h-3.5 w-3.5" />
-                {manualSaving ? 'Menyimpan...' : 'Simpan Absen'}
+                <RefreshCw className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} />
+                <span>Refresh</span>
               </button>
+
+              {!readOnly && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowManualForm((v) => !v);
+                    setManualDate(selectedDate);
+                    setManualMsg(null);
+                  }}
+                  className="btn btn-sm btn-primary font-normal gap-1.5 w-full sm:w-auto"
+                >
+                  <PlusCircle className="h-3.5 w-3.5" />
+                  <span>Input Manual</span>
+                </button>
+              )}
             </div>
-            {manualMsg && (
-              <div
-                className={`sm:col-span-4 rounded-xl border px-3 py-2 text-xs font-medium ${
-                  manualMsg.type === 'success'
-                    ? 'border-emerald-300 bg-emerald-50 text-emerald-800 dark:border-emerald-500/40 dark:bg-emerald-950/50 dark:text-emerald-300'
-                    : manualMsg.type === 'warning'
-                      ? 'border-amber-300 bg-amber-50 text-amber-800 dark:border-amber-500/40 dark:bg-amber-950/50 dark:text-amber-300'
-                      : 'border-rose-300 bg-rose-50 text-rose-800 dark:border-rose-500/40 dark:bg-rose-950/50 dark:text-rose-300'
-                }`}
+
+            <div className="grid grid-cols-2 gap-1.5 sm:flex sm:flex-wrap sm:items-center sm:gap-1.5">
+              <a
+                href={api.getExportCsvUrl(selectedDate, 'summary', workspace)}
+                download
+                className="btn btn-sm btn-ghost border border-base-300 gap-1 font-normal"
               >
-                {manualMsg.text}
+                <Download className="h-3.5 w-3.5" />
+                Rekap (.csv)
+              </a>
+              <a
+                href={api.getExportCsvUrl(selectedDate, 'logs', workspace)}
+                download
+                className="btn btn-sm btn-ghost border border-base-300 gap-1 font-normal"
+              >
+                <Download className="h-3.5 w-3.5" />
+                Log (.csv)
+              </a>
+              <a
+                href={api.getExportPdfUrl(selectedDate, 'summary', workspace)}
+                download
+                className="btn btn-sm btn-ghost border border-base-300 gap-1 font-normal"
+              >
+                <FileText className="h-3.5 w-3.5" />
+                Rekap (.pdf)
+              </a>
+              <a
+                href={api.getExportPdfUrl(selectedDate, 'logs', workspace)}
+                download
+                className="btn btn-sm btn-ghost border border-base-300 gap-1 font-normal"
+              >
+                <FileText className="h-3.5 w-3.5" />
+                Log (.pdf)
+              </a>
+              <a
+                href={api.getExportPdfUrl(selectedDate, 'all', workspace)}
+                download
+                className="col-span-2 sm:col-span-1 btn btn-sm btn-primary gap-1 font-medium"
+              >
+                <FileText className="h-3.5 w-3.5" />
+                Lengkap (.pdf)
+              </a>
+            </div>
+          </div>
+
+          {showManualForm && (
+            <form
+              onSubmit={handleManualAttendanceSubmit}
+              className="grid gap-3 rounded-box border border-base-300 bg-base-200/50 p-3.5 sm:grid-cols-4"
+            >
+              <label className="form-control">
+                <span className="label-text mb-1 text-xs font-medium">Pilih Anggota</span>
+                <select
+                  value={manualUserId}
+                  onChange={(e) => setManualUserId(e.target.value)}
+                  required
+                  className="select select-bordered select-sm w-full"
+                >
+                  {(summary.memberAttendance || []).map((m) => (
+                    <option key={m.userId} value={String(m.userId)}>
+                      {m.personName} ({m.identifier})
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                <label className="form-control">
+                  <span className="label-text mb-1 text-xs font-medium">Tanggal</span>
+                  <input
+                    type="date"
+                    value={manualDate}
+                    onChange={(e) => setManualDate(e.target.value)}
+                    required
+                    className="input input-bordered input-sm w-full"
+                  />
+                </label>
+                <label className="form-control">
+                  <span className="label-text mb-1 text-xs font-medium">
+                    Jam ({getSessionLabelFromTime(manualTime)})
+                  </span>
+                  <input
+                    type="time"
+                    value={manualTime}
+                    onChange={(e) => setManualTime(e.target.value)}
+                    required
+                    className="input input-bordered input-sm w-full"
+                  />
+                </label>
               </div>
-            )}
-          </form>
-        )}
+              <label className="form-control">
+                <span className="label-text mb-1 text-xs font-medium">Catatan</span>
+                <input
+                  type="text"
+                  value={manualNote}
+                  onChange={(e) => setManualNote(e.target.value)}
+                  placeholder="Catatan..."
+                  className="input input-bordered input-sm w-full"
+                />
+              </label>
+              <div className="flex items-end">
+                <button
+                  type="submit"
+                  disabled={manualSaving || !manualUserId}
+                  className="btn btn-sm btn-primary w-full gap-1.5"
+                >
+                  <CheckCircle2 className="h-3.5 w-3.5" />
+                  {manualSaving ? 'Menyimpan...' : 'Simpan'}
+                </button>
+              </div>
+              {manualMsg && (
+                <div
+                  className={`alert sm:col-span-4 py-2 text-xs ${
+                    manualMsg.type === 'success'
+                      ? 'alert-success'
+                      : manualMsg.type === 'warning'
+                        ? 'alert-warning'
+                        : 'alert-error'
+                  }`}
+                >
+                  <span>{manualMsg.text}</span>
+                </div>
+              )}
+            </form>
+          )}
+        </div>
       </div>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-        <div className="rounded-2xl border border-stone-200 bg-white p-3.5 shadow-sm dark:border-stone-800 dark:bg-[#1C1917] dark:shadow-none sm:p-4">
-          <div className="flex items-center justify-between text-base-content/60">
-            <span className="text-[11px] font-semibold uppercase sm:text-xs">Total Masuk</span>
-            <Users className="h-4 w-4 text-sky-600 dark:text-sky-400" />
+        <div className="card border border-base-300 bg-base-100">
+          <div className="card-body p-3.5 sm:p-4 gap-1">
+            <div className="flex items-center justify-between text-base-content/60">
+              <span className="text-xs font-medium">Total Masuk</span>
+              <Users className="h-4 w-4 text-primary" />
+            </div>
+            <p className="text-2xl font-semibold text-base-content sm:text-3xl">
+              {summary.totalCount}
+            </p>
+            <p className="text-[11px] text-base-content/60">
+              Pagi: {summary.morningCount || 0} • Sore: {summary.eveningCount || 0}
+            </p>
           </div>
-          <p className="mt-1.5 text-2xl font-bold text-base-content sm:mt-2 sm:text-3xl">
-            {summary.totalCount}
-          </p>
-          <p className="mt-1 text-[11px] text-base-content/60 sm:text-xs">
-            Pagi: {summary.morningCount || 0} • Sore: {summary.eveningCount || 0}
-          </p>
         </div>
 
-        <div className="rounded-2xl border border-emerald-200 bg-emerald-50/70 p-3.5 shadow-sm dark:border-emerald-500/20 dark:bg-emerald-950/20 dark:shadow-none sm:p-4">
-          <div className="flex items-center justify-between text-emerald-700 dark:text-emerald-300">
-            <span className="text-[11px] font-semibold uppercase sm:text-xs">Terdaftar</span>
-            <UserCheck className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+        <div className="card border border-base-300 bg-base-100">
+          <div className="card-body p-3.5 sm:p-4 gap-1">
+            <div className="flex items-center justify-between text-base-content/60">
+              <span className="text-xs font-medium">Terdaftar</span>
+              <UserCheck className="h-4 w-4 text-success" />
+            </div>
+            <p className="text-2xl font-semibold text-success sm:text-3xl">
+              {summary.registeredCount}
+            </p>
+            <p className="text-[11px] text-base-content/60">
+              {summary.uniqueRegisteredCount} orang hadir
+            </p>
           </div>
-          <p className="mt-1.5 text-2xl font-bold text-emerald-600 dark:text-emerald-400 sm:mt-2 sm:text-3xl">
-            {summary.registeredCount}
-          </p>
-          <p className="mt-1 text-[11px] text-emerald-700/80 dark:text-emerald-300/70 sm:text-xs">
-            {summary.uniqueRegisteredCount} orang unik hadir
-          </p>
         </div>
 
-        <div className="rounded-2xl border border-amber-200 bg-amber-50/70 p-3.5 shadow-sm dark:border-amber-500/20 dark:bg-amber-950/20 dark:shadow-none sm:p-4">
-          <div className="flex items-center justify-between text-amber-700 dark:text-amber-300">
-            <span className="text-[11px] font-semibold uppercase sm:text-xs">Bablas</span>
-            <UserX className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+        <div className="card border border-base-300 bg-base-100">
+          <div className="card-body p-3.5 sm:p-4 gap-1">
+            <div className="flex items-center justify-between text-base-content/60">
+              <span className="text-xs font-medium">Tamu</span>
+              <UserX className="h-4 w-4 text-warning" />
+            </div>
+            <p className="text-2xl font-semibold text-warning sm:text-3xl">
+              {summary.unregisteredCount}
+            </p>
+            <p className="text-[11px] text-base-content/60">
+              Belum terdaftar
+            </p>
           </div>
-          <p className="mt-1.5 text-2xl font-bold text-amber-600 dark:text-amber-400 sm:mt-2 sm:text-3xl">
-            {summary.unregisteredCount}
-          </p>
-          <p className="mt-1 text-[11px] text-amber-700/80 dark:text-amber-300/70 sm:text-xs">
-            Lewat tanpa regis
-          </p>
         </div>
 
-        <div className="rounded-2xl border border-stone-200 bg-white p-3.5 shadow-sm dark:border-stone-800 dark:bg-[#1C1917] dark:shadow-none sm:p-4">
-          <div className="flex items-center justify-between text-base-content/60">
-            <span className="text-[11px] font-semibold uppercase sm:text-xs">Rasio Hadir</span>
-            <BarChart3 className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
+        <div className="card border border-base-300 bg-base-100">
+          <div className="card-body p-3.5 sm:p-4 gap-1">
+            <div className="flex items-center justify-between text-base-content/60">
+              <span className="text-xs font-medium">Rasio Hadir</span>
+              <BarChart3 className="h-4 w-4 text-info" />
+            </div>
+            <p className="text-2xl font-semibold text-info sm:text-3xl">
+              {registeredPct}%
+            </p>
+            <p className="text-[11px] text-base-content/60">
+              Dari trafik hari ini
+            </p>
           </div>
-          <p className="mt-1.5 text-2xl font-bold text-indigo-600 dark:text-indigo-300 sm:mt-2 sm:text-3xl">
-            {registeredPct}%
-          </p>
-          <p className="mt-1 text-[11px] text-base-content/60 sm:text-xs">
-            Dari trafik hari ini
-          </p>
         </div>
       </div>
 
       {/* Hourly Breakdown Chart */}
-      <div className="rounded-2xl border border-stone-200 bg-white p-4 shadow-sm dark:border-stone-800 dark:bg-[#1C1917] dark:shadow-none sm:p-5">
-        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-          <div>
-            <h3 className="text-sm font-bold text-base-content">
-              Trafik Masuk Per Jam ({summary.date})
-            </h3>
-            <p className="text-xs text-base-content/60">
-              Perbandingan terdaftar vs tidak terdaftar (bablas)
-            </p>
+      <div className="card border border-base-300 bg-base-100">
+        <div className="card-body gap-3 p-4 sm:p-5">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h3 className="text-sm font-semibold text-base-content">
+                Kunjungan Per Jam ({summary.date})
+              </h3>
+              <p className="text-xs text-base-content/60">
+                Perbandingan anggota terdaftar dan tamu
+              </p>
+            </div>
+            <div className="flex items-center gap-4 text-xs">
+              <span className="inline-flex items-center gap-1.5 text-base-content/80">
+                <span className="h-2.5 w-2.5 rounded-sm bg-success" /> Terdaftar
+              </span>
+              <span className="inline-flex items-center gap-1.5 text-base-content/80">
+                <span className="h-2.5 w-2.5 rounded-sm bg-warning" /> Tamu
+              </span>
+            </div>
           </div>
-          <div className="flex items-center gap-4 text-xs">
-            <span className="inline-flex items-center gap-1.5 font-medium text-emerald-700 dark:text-emerald-300">
-              <span className="h-2.5 w-2.5 rounded-sm bg-emerald-500" /> Terdaftar
-            </span>
-            <span className="inline-flex items-center gap-1.5 font-medium text-amber-700 dark:text-amber-300">
-              <span className="h-2.5 w-2.5 rounded-sm bg-amber-500" /> Bablas
-            </span>
-          </div>
-        </div>
 
-        <div className="flex h-36 items-end gap-1 overflow-x-auto pt-3 sm:h-40 sm:gap-1.5">
-          {(summary.hourlyBreakdown || []).map((bucket) => {
-            const regH = Math.round((bucket.registered / maxHourlyTotal) * 100);
-            const unregH = Math.round((bucket.unregistered / maxHourlyTotal) * 100);
-            return (
-              <div
-                key={bucket.hour}
-                className="group flex min-w-[20px] flex-1 flex-col items-center gap-1 sm:min-w-[26px]"
-                title={`${bucket.hour} — Terdaftar: ${bucket.registered}, Bablas: ${bucket.unregistered}`}
-              >
-                <div className="flex h-24 w-full flex-col justify-end gap-0.5 rounded-md bg-stone-100 p-0.5 dark:bg-[#141210]/70 sm:h-28">
-                  {bucket.unregistered > 0 && (
-                    <div
-                      style={{ height: `${Math.max(8, unregH)}%` }}
-                      className="w-full rounded-sm bg-amber-500 transition-all"
-                    />
-                  )}
-                  {bucket.registered > 0 && (
-                    <div
-                      style={{ height: `${Math.max(8, regH)}%` }}
-                      className="w-full rounded-sm bg-emerald-500 transition-all"
-                    />
-                  )}
+          <div className="flex h-36 items-end gap-1 overflow-x-auto pt-3 sm:h-40 sm:gap-1.5">
+            {(summary.hourlyBreakdown || []).map((bucket) => {
+              const regH = Math.round((bucket.registered / maxHourlyTotal) * 100);
+              const unregH = Math.round((bucket.unregistered / maxHourlyTotal) * 100);
+              return (
+                <div
+                  key={bucket.hour}
+                  className="group flex min-w-[20px] flex-1 flex-col items-center gap-1 sm:min-w-[26px]"
+                  title={`${bucket.hour} — Terdaftar: ${bucket.registered}, Tamu: ${bucket.unregistered}`}
+                >
+                  <div className="flex h-24 w-full flex-col justify-end gap-0.5 rounded bg-base-200 p-0.5 sm:h-28">
+                    {bucket.unregistered > 0 && (
+                      <div
+                        style={{ height: `${Math.max(8, unregH)}%` }}
+                        className="w-full rounded-sm bg-warning transition-all"
+                      />
+                    )}
+                    {bucket.registered > 0 && (
+                      <div
+                        style={{ height: `${Math.max(8, regH)}%` }}
+                        className="w-full rounded-sm bg-success transition-all"
+                      />
+                    )}
+                  </div>
+                  <span className="text-[9px] text-base-content/60 sm:text-[10px]">
+                    {bucket.hour.slice(0, 2)}
+                  </span>
                 </div>
-                <span className="text-[9px] text-stone-500 sm:text-[10px]">
-                  {bucket.hour.slice(0, 2)}
-                </span>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       </div>
 
       {/* 1. Rekap Absensi Daftar Anggota per Tanggal */}
-      <div className="overflow-hidden rounded-2xl border border-base-300 bg-base-100 shadow-sm">
-        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-stone-200 px-4 py-3.5 dark:border-stone-800 sm:px-5">
+      <div className="overflow-hidden rounded-box border border-base-300 bg-base-100">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-base-300 px-4 py-3.5 sm:px-5">
           <div>
-            <h3 className="text-sm font-bold text-base-content">
-              Rekap Kehadiran {wsMeta.membersNoun} ({summary.date})
+            <h3 className="text-sm font-semibold text-base-content">
+              Rekap Kehadiran ({summary.date})
             </h3>
             <p className="text-xs text-base-content/60">
-              Seluruh {wsMeta.memberNoun.toLowerCase()} aktif terdaftar &amp; status kehadiran tanggal {summary.date}
+              {wsMeta.membersNoun} aktif dan status kehadiran
             </p>
           </div>
           <div className="flex items-center gap-2 text-xs">
-            <span className="whitespace-nowrap rounded-lg bg-emerald-50 px-2.5 py-1 font-semibold text-emerald-700 ring-1 ring-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:ring-0">
+            <span className="badge badge-success badge-outline badge-sm">
               Hadir: {summary.presentMembersCount ?? 0}
             </span>
-            <span className="whitespace-nowrap rounded-lg bg-rose-50 px-2.5 py-1 font-semibold text-rose-700 ring-1 ring-rose-200 dark:bg-rose-500/15 dark:text-rose-300 dark:ring-0">
+            <span className="badge badge-error badge-outline badge-sm">
               Tidak Hadir: {summary.absentMembersCount ?? 0}
             </span>
           </div>
         </div>
 
-        {/* Mobile Cards (Zero horizontal scroll) */}
+        {/* Mobile Cards */}
         <div className="divide-y divide-base-300 md:hidden">
           {!summary.memberAttendance || summary.memberAttendance.length === 0 ? (
-            <div className="px-4 py-8 text-center text-xs text-stone-500">
-              Belum ada anggota terdaftar di database.
+            <div className="px-4 py-8 text-center text-xs text-base-content/60">
+              Belum ada data anggota.
             </div>
           ) : (
             summary.memberAttendance.map((m, i) => {
@@ -533,7 +538,7 @@ export default function ReportsSummary({ workspace = 'piloting', readOnly = fals
               return (
               <div key={m.userId || i} className="flex items-center justify-between gap-3 px-4 py-3">
                 <div className="min-w-0">
-                  <div className="truncate text-sm font-bold text-base-content">
+                  <div className="truncate text-sm font-semibold text-base-content">
                     {i + 1}. {m.personName}
                   </div>
                   <div className="mt-0.5 text-xs text-base-content/60">
@@ -542,26 +547,24 @@ export default function ReportsSummary({ workspace = 'piloting', readOnly = fals
                   <div className="mt-1 flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-[11px] text-base-content/60">
                     <span>Tgl: {m.date}</span>
                     {m.sessionLabel && (
-                      <span className="badge badge-xs badge-outline font-semibold">
+                      <span className="badge badge-xs badge-outline">
                         {m.sessionLabel}
                       </span>
                     )}
                     {m.firstEntry && (
                       <span>
-                        • Jam: <strong className="text-stone-700 dark:text-stone-200">{new Date(m.firstEntry).toLocaleTimeString('id-ID')}</strong>
+                        • Jam: <strong className="text-base-content">{new Date(m.firstEntry).toLocaleTimeString('id-ID')}</strong>
                       </span>
                     )}
                     {m.confidence !== null && (
-                      <span className="text-sky-600 dark:text-sky-300">• Sync {m.confidence}%</span>
+                      <span className="text-base-content/75">• {m.confidence}%</span>
                     )}
                   </div>
                 </div>
                 <div className="flex shrink-0 flex-col items-end gap-1.5">
                   <span
-                    className={`whitespace-nowrap rounded px-2 py-0.5 text-xs font-semibold ${
-                      m.present
-                        ? 'border border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300'
-                        : 'border border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-800 dark:bg-rose-950/60 dark:text-rose-300'
+                    className={`badge badge-sm ${
+                      m.present ? 'badge-success badge-outline' : 'badge-error badge-outline'
                     }`}
                   >
                     {m.attendanceStatus}
@@ -579,7 +582,7 @@ export default function ReportsSummary({ workspace = 'piloting', readOnly = fals
                               prefillUserId: String(m.userId),
                             })
                           }
-                          className="rounded border border-emerald-600 px-2 py-0.5 text-[11px] font-medium text-emerald-700 hover:bg-emerald-50 dark:text-emerald-300"
+                          className="btn btn-xs btn-ghost border border-base-300 font-normal"
                         >
                           + Hadir
                         </button>
@@ -590,7 +593,7 @@ export default function ReportsSummary({ workspace = 'piloting', readOnly = fals
                             onClick={() =>
                               setLogModal({ open: true, mode: 'edit', initialLog: matchingLog, prefillUserId: '' })
                             }
-                            className="rounded border border-base-300 p-1 text-sky-600 hover:bg-base-200"
+                            className="btn btn-xs btn-ghost border border-base-300 btn-square"
                             title="Edit Kehadiran"
                           >
                             <Edit3 className="h-3 w-3" />
@@ -598,7 +601,7 @@ export default function ReportsSummary({ workspace = 'piloting', readOnly = fals
                           <button
                             type="button"
                             onClick={() => handleDeleteLogFromReport(matchingLog)}
-                            className="rounded border border-base-300 p-1 text-rose-600 hover:bg-rose-50"
+                            className="btn btn-xs btn-ghost border border-base-300 text-error btn-square"
                             title="Hapus Kehadiran"
                           >
                             <Trash2 className="h-3 w-3" />
@@ -616,24 +619,24 @@ export default function ReportsSummary({ workspace = 'piloting', readOnly = fals
 
         {/* Desktop Table */}
         <div className="hidden overflow-x-auto md:block">
-          <table className="w-full text-left text-sm">
-            <thead className="border-b border-stone-200 bg-base-200 text-xs uppercase text-base-content/60 border-base-300">
+          <table className="table table-sm w-full">
+            <thead className="bg-base-200 text-xs text-base-content/70">
               <tr>
-                <th className="px-4 py-3">No</th>
-                <th className="px-4 py-3">Nama Anggota</th>
-                <th className="px-4 py-3">ID / Divisi</th>
-                <th className="px-4 py-3">Tgl Absen</th>
-                <th className="px-4 py-3">Kehadiran</th>
-                <th className="px-4 py-3">Jam Masuk</th>
-                <th className="px-4 py-3">Sync DB</th>
-                {!readOnly && <th className="px-4 py-3 text-right">Aksi</th>}
+                <th>No</th>
+                <th>Nama Anggota</th>
+                <th>Nomor Induk / Bagian</th>
+                <th>Tgl Absen</th>
+                <th>Kehadiran</th>
+                <th>Jam Masuk</th>
+                <th>Kemiripan</th>
+                {!readOnly && <th className="text-right">Aksi</th>}
               </tr>
             </thead>
-            <tbody className="divide-y divide-base-300">
+            <tbody>
               {!summary.memberAttendance || summary.memberAttendance.length === 0 ? (
                 <tr>
-                  <td colSpan={readOnly ? 7 : 8} className="px-4 py-8 text-center text-xs text-stone-500">
-                    Belum ada anggota terdaftar di database. Silakan registrasi wajah terlebih dahulu.
+                  <td colSpan={readOnly ? 7 : 8} className="px-4 py-8 text-center text-xs text-base-content/60">
+                    Belum ada data anggota.
                   </td>
                 </tr>
               ) : (
@@ -642,36 +645,34 @@ export default function ReportsSummary({ workspace = 'piloting', readOnly = fals
                     (l) => l.status === 'REGISTERED' && l.userId && String(l.userId) === String(m.userId)
                   );
                   return (
-                  <tr key={m.userId || i} className="hover:bg-stone-50 dark:hover:bg-stone-800/30">
-                    <td className="px-4 py-3 text-xs text-stone-500">{i + 1}</td>
-                    <td className="px-4 py-3 font-semibold text-base-content">
+                  <tr key={m.userId || i} className="hover">
+                    <td className="text-xs text-base-content/60">{i + 1}</td>
+                    <td className="font-semibold text-base-content">
                       {m.personName}
                     </td>
-                    <td className="px-4 py-3 text-xs text-base-content/75">
+                    <td className="text-xs text-base-content/75">
                       {m.identifier} • {m.department}{m.wilayah ? ` • ${formatWilayahLabel(m.wilayah)}` : ''}
                     </td>
-                    <td className="whitespace-nowrap px-4 py-3 text-xs font-medium text-base-content/75">
+                    <td className="whitespace-nowrap text-xs text-base-content/75">
                       {m.date}
                     </td>
-                    <td className="px-4 py-3">
+                    <td>
                       <span
-                        className={`inline-flex whitespace-nowrap items-center rounded px-2 py-0.5 text-xs font-semibold ${
-                          m.present
-                            ? 'border border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300'
-                            : 'border border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-800 dark:bg-rose-950/60 dark:text-rose-300'
+                        className={`badge badge-sm ${
+                          m.present ? 'badge-success badge-outline' : 'badge-error badge-outline'
                         }`}
                       >
                         {m.attendanceStatus}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-xs text-base-content/75">
+                    <td className="text-xs text-base-content/75">
                       {m.firstEntry ? new Date(m.firstEntry).toLocaleTimeString('id-ID') : '-'}
                     </td>
-                    <td className="px-4 py-3 text-xs font-medium text-sky-600 dark:text-sky-300">
+                    <td className="text-xs text-base-content/75">
                       {m.confidence !== null ? `${m.confidence}%` : '-'}
                     </td>
                     {!readOnly && (
-                      <td className="px-4 py-3 text-right">
+                      <td className="text-right">
                         {!m.present ? (
                           <button
                             type="button"
@@ -683,7 +684,7 @@ export default function ReportsSummary({ workspace = 'piloting', readOnly = fals
                                 prefillUserId: String(m.userId),
                               })
                             }
-                            className="inline-flex items-center gap-1 rounded border border-emerald-600 px-2 py-1 text-[11px] font-medium text-emerald-700 hover:bg-emerald-50 dark:text-emerald-300"
+                            className="btn btn-xs btn-ghost border border-base-300 font-normal gap-1"
                           >
                             <Plus className="h-3 w-3" />
                             Hadir
@@ -695,7 +696,7 @@ export default function ReportsSummary({ workspace = 'piloting', readOnly = fals
                               onClick={() =>
                                 setLogModal({ open: true, mode: 'edit', initialLog: matchingLog, prefillUserId: '' })
                               }
-                              className="rounded border border-base-300 bg-base-100 p-1 text-sky-600 hover:bg-base-200"
+                              className="btn btn-xs btn-ghost border border-base-300 btn-square"
                               title="Edit Log Kehadiran"
                             >
                               <Edit3 className="h-3.5 w-3.5" />
@@ -703,7 +704,7 @@ export default function ReportsSummary({ workspace = 'piloting', readOnly = fals
                             <button
                               type="button"
                               onClick={() => handleDeleteLogFromReport(matchingLog)}
-                              className="rounded border border-base-300 bg-base-100 p-1 text-rose-600 hover:bg-rose-50"
+                              className="btn btn-xs btn-ghost border border-base-300 text-error btn-square"
                               title="Hapus Log Kehadiran"
                             >
                               <Trash2 className="h-3.5 w-3.5" />
@@ -723,17 +724,17 @@ export default function ReportsSummary({ workspace = 'piloting', readOnly = fals
         </div>
       </div>
 
-      {/* 2. Rekap Absen Periode Tertentu (Nama & Jml Tidak Hadir) */}
-      <div className="overflow-hidden rounded-2xl border border-base-300 bg-base-100 shadow-sm">
-        <div className="flex flex-col gap-3 border-b border-stone-200 px-4 py-4 dark:border-stone-800 sm:px-5 lg:flex-row lg:items-center lg:justify-between">
+      {/* 2. Rekap Absen Periode Tertentu */}
+      <div className="overflow-hidden rounded-box border border-base-300 bg-base-100">
+        <div className="flex flex-col gap-3 border-b border-base-300 px-4 py-4 sm:px-5 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-start gap-2.5">
-            <CalendarRange className="mt-0.5 h-5 w-5 shrink-0 text-indigo-600 dark:text-indigo-400" />
+            <CalendarRange className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
             <div>
-              <h3 className="text-sm font-bold text-base-content">
-                Rekap Absen Periode Tertentu (Jumlah Tidak Hadir)
+              <h3 className="text-sm font-semibold text-base-content">
+                Rekap Periode ({periodReport.totalDays} hari)
               </h3>
               <p className="text-xs text-base-content/60">
-                Periode {periodReport.startDate} s/d {periodReport.endDate} ({periodReport.totalDays} hari)
+                {periodReport.startDate} s/d {periodReport.endDate}
               </p>
             </div>
           </div>
@@ -744,33 +745,33 @@ export default function ReportsSummary({ workspace = 'piloting', readOnly = fals
                 type="date"
                 value={periodStart}
                 onChange={(e) => setPeriodStart(e.target.value)}
-                className="w-full rounded-xl border border-stone-300 bg-stone-50 px-2.5 py-1.5 text-xs text-stone-900 focus:border-[#7C2D12] focus:outline-none dark:border-stone-700 dark:bg-stone-950 dark:text-white"
-                title="Tanggal Mulai Periode"
+                className="input input-bordered input-xs w-full"
+                title="Tanggal Mulai"
               />
-              <span className="text-center text-xs text-stone-400">s/d</span>
+              <span className="text-center text-xs text-base-content/50">s/d</span>
               <input
                 type="date"
                 value={periodEnd}
                 onChange={(e) => setPeriodEnd(e.target.value)}
-                className="w-full rounded-xl border border-stone-300 bg-stone-50 px-2.5 py-1.5 text-xs text-stone-900 focus:border-[#7C2D12] focus:outline-none dark:border-stone-700 dark:bg-stone-950 dark:text-white"
-                title="Tanggal Akhir Periode"
+                className="input input-bordered input-xs w-full"
+                title="Tanggal Akhir"
               />
             </div>
 
-            <div className="flex flex-wrap items-center gap-2">
-              <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-stone-300 bg-stone-50 px-2.5 py-1.5 text-xs text-stone-700 dark:border-stone-700 dark:bg-stone-950 dark:text-stone-300">
+            <div className="flex flex-wrap items-center gap-1.5">
+              <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-btn border border-base-300 bg-base-100 px-2.5 py-1 text-xs text-base-content">
                 <input
                   type="checkbox"
                   checked={weekdaysOnly}
                   onChange={(e) => setWeekdaysOnly(e.target.checked)}
-                  className="rounded border-stone-400 accent-sky-600"
+                  className="checkbox checkbox-xs checkbox-primary"
                 />
-                Senin–Jumat saja
+                Senin–Jumat
               </label>
               <a
                 href={api.getExportPeriodCsvUrl(periodStart, periodEnd, weekdaysOnly, workspace)}
                 download
-                className="inline-flex items-center gap-1 rounded-xl bg-[#1E4D3B] px-3 py-1.5 text-xs font-bold text-[#FAF7F2] hover:bg-[#173c2e] dark:bg-emerald-700 dark:hover:bg-emerald-600"
+                className="btn btn-xs btn-ghost border border-base-300 font-normal gap-1"
               >
                 <Download className="h-3.5 w-3.5" />
                 Periode (.csv)
@@ -778,7 +779,7 @@ export default function ReportsSummary({ workspace = 'piloting', readOnly = fals
               <a
                 href={api.getExportPeriodPdfUrl(periodStart, periodEnd, weekdaysOnly, workspace)}
                 download
-                className="inline-flex items-center gap-1 rounded-xl bg-[#7C2D12] px-3 py-1.5 text-xs font-bold text-[#FAF7F2] hover:bg-[#64220c] dark:bg-amber-700 dark:hover:bg-amber-600"
+                className="btn btn-xs btn-primary font-medium gap-1"
               >
                 <FileText className="h-3.5 w-3.5" />
                 Periode (.pdf)
@@ -787,47 +788,45 @@ export default function ReportsSummary({ workspace = 'piloting', readOnly = fals
           </div>
         </div>
 
-        {/* Mobile Cards for Period Summary (Zero horizontal scroll) */}
+        {/* Mobile Cards for Period Summary */}
         <div className="divide-y divide-base-300 md:hidden">
           {periodLoading ? (
-            <div className="px-4 py-6 text-center text-xs text-stone-500">
-              Menyusun rekap periode...
+            <div className="px-4 py-6 text-center text-xs text-base-content/60">
+              Memuat rekap periode...
             </div>
           ) : !periodReport.members || periodReport.members.length === 0 ? (
-            <div className="px-4 py-6 text-center text-xs text-stone-500">
-              Belum ada anggota terdaftar untuk periode ini.
+            <div className="px-4 py-6 text-center text-xs text-base-content/60">
+              Belum ada data anggota.
             </div>
           ) : (
             periodReport.members.map((m, idx) => (
               <div key={m.userId || idx} className="space-y-2 px-4 py-3">
                 <div className="flex items-center justify-between gap-2">
                   <div className="min-w-0">
-                    <div className="truncate text-sm font-bold text-base-content">
+                    <div className="truncate text-sm font-semibold text-base-content">
                       {idx + 1}. {m.personName}
                     </div>
                     <div className="text-xs text-base-content/60">
                       {m.identifier} • {m.department}
                     </div>
                   </div>
-                  <span className="shrink-0 whitespace-nowrap text-xs font-bold text-sky-600 dark:text-sky-300">
+                  <span className="badge badge-ghost badge-sm shrink-0">
                     {m.attendanceRate}% hadir
                   </span>
                 </div>
-                <div className="flex flex-wrap items-center gap-2 text-xs">
-                  <span className="whitespace-nowrap rounded-lg bg-stone-100 px-2 py-0.5 text-stone-600 dark:bg-stone-800 dark:text-stone-300">
-                    Periode: {m.totalDays} hari
+                <div className="flex flex-wrap items-center gap-1.5 text-xs">
+                  <span className="badge badge-ghost badge-sm">
+                    {m.totalDays} hari
                   </span>
-                  <span className="whitespace-nowrap rounded-lg bg-emerald-50 px-2.5 py-0.5 font-bold text-emerald-700 ring-1 ring-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:ring-0">
-                    Hadir: {m.presentDays} hari
+                  <span className="badge badge-success badge-outline badge-sm">
+                    Hadir: {m.presentDays}
                   </span>
                   <span
-                    className={`whitespace-nowrap rounded-lg px-2.5 py-0.5 font-bold ${
-                      m.absentDays > 0
-                        ? 'bg-rose-50 text-rose-700 ring-1 ring-rose-200 dark:bg-rose-500/20 dark:text-rose-300 dark:ring-rose-500/30'
-                        : 'bg-stone-100 text-stone-600 dark:bg-stone-800 dark:text-stone-300'
+                    className={`badge badge-sm ${
+                      m.absentDays > 0 ? 'badge-error badge-outline' : 'badge-ghost'
                     }`}
                   >
-                    Tidak Hadir: {m.absentDays} hari
+                    Tidak Hadir: {m.absentDays}
                   </span>
                 </div>
               </div>
@@ -837,61 +836,59 @@ export default function ReportsSummary({ workspace = 'piloting', readOnly = fals
 
         {/* Desktop Table */}
         <div className="hidden overflow-x-auto md:block">
-          <table className="w-full text-left text-sm">
-            <thead className="border-b border-stone-200 bg-base-200 text-xs uppercase text-base-content/60 border-base-300">
+          <table className="table table-sm w-full">
+            <thead className="bg-base-200 text-xs text-base-content/70">
               <tr>
-                <th className="px-4 py-3">No</th>
-                <th className="px-4 py-3">Nama</th>
-                <th className="px-4 py-3">ID / Divisi</th>
-                <th className="px-4 py-3">Total Hari</th>
-                <th className="px-4 py-3">Jml Hadir</th>
-                <th className="px-4 py-3">Jml Tidak Hadir</th>
-                <th className="px-4 py-3">Persentase</th>
+                <th>No</th>
+                <th>Nama</th>
+                <th>Nomor Induk / Bagian</th>
+                <th>Total Hari</th>
+                <th>Hadir</th>
+                <th>Tidak Hadir</th>
+                <th>Persentase</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-base-300">
+            <tbody>
               {periodLoading ? (
                 <tr>
-                  <td colSpan={7} className="px-4 py-6 text-center text-xs text-stone-500">
-                    Menyusun rekap periode...
+                  <td colSpan={7} className="px-4 py-6 text-center text-xs text-base-content/60">
+                    Memuat rekap periode...
                   </td>
                 </tr>
               ) : !periodReport.members || periodReport.members.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-4 py-6 text-center text-xs text-stone-500">
-                    Belum ada anggota terdaftar untuk periode yang dipilih.
+                  <td colSpan={7} className="px-4 py-6 text-center text-xs text-base-content/60">
+                    Belum ada data anggota.
                   </td>
                 </tr>
               ) : (
                 periodReport.members.map((m, idx) => (
-                  <tr key={m.userId || idx} className="hover:bg-stone-50 dark:hover:bg-stone-800/30">
-                    <td className="px-4 py-3 text-xs text-stone-500">{idx + 1}</td>
-                    <td className="px-4 py-3 font-semibold text-base-content">
+                  <tr key={m.userId || idx} className="hover">
+                    <td className="text-xs text-base-content/60">{idx + 1}</td>
+                    <td className="font-semibold text-base-content">
                       {m.personName}
                     </td>
-                    <td className="px-4 py-3 text-xs text-base-content/75">
+                    <td className="text-xs text-base-content/75">
                       {m.identifier} • {m.department}{m.wilayah ? ` • ${formatWilayahLabel(m.wilayah)}` : ''}
                     </td>
-                    <td className="whitespace-nowrap px-4 py-3 text-xs text-base-content/75">
+                    <td className="whitespace-nowrap text-xs text-base-content/75">
                       {m.totalDays} hari
                     </td>
-                    <td className="px-4 py-3">
-                      <span className="whitespace-nowrap rounded-lg bg-emerald-50 px-2.5 py-0.5 text-xs font-bold text-emerald-700 ring-1 ring-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:ring-0">
+                    <td>
+                      <span className="badge badge-success badge-outline badge-sm">
                         {m.presentDays} hari
                       </span>
                     </td>
-                    <td className="px-4 py-3">
+                    <td>
                       <span
-                        className={`whitespace-nowrap rounded-lg px-2.5 py-0.5 text-xs font-bold ${
-                          m.absentDays > 0
-                            ? 'bg-rose-50 text-rose-700 ring-1 ring-rose-200 dark:bg-rose-500/20 dark:text-rose-300 dark:ring-rose-500/30'
-                            : 'bg-stone-100 text-stone-600 dark:bg-stone-800 dark:text-stone-300'
+                        className={`badge badge-sm ${
+                          m.absentDays > 0 ? 'badge-error badge-outline' : 'badge-ghost'
                         }`}
                       >
                         {m.absentDays} hari
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-xs font-semibold text-sky-600 dark:text-sky-300">
+                    <td className="text-xs font-medium text-base-content">
                       {m.attendanceRate}%
                     </td>
                   </tr>
@@ -905,30 +902,30 @@ export default function ReportsSummary({ workspace = 'piloting', readOnly = fals
       {/* Detailed Entrance Log Table */}
       <div className="space-y-3">
         <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between">
-          <h3 className="text-sm font-bold text-base-content">
-            Detail Log Masuk ({logs.length} entri)
+          <h3 className="text-sm font-semibold text-base-content">
+            Log Masuk ({logs.length} entri)
           </h3>
 
           <div className="grid grid-cols-1 gap-2 sm:flex sm:items-center">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-stone-400" />
+              <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-base-content/40" />
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Cari nama atau catatan..."
-                className="w-full rounded-xl border border-base-300 bg-base-100 py-1.5 pl-8 pr-3 text-xs text-stone-900 placeholder-stone-400 focus:border-[#7C2D12] focus:outline-none dark:border-stone-800 dark:bg-stone-900 dark:text-white dark:placeholder-stone-500"
+                className="input input-bordered input-sm w-full pl-8"
               />
             </div>
 
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="rounded-md border border-base-300 bg-base-100 px-3 py-1.5 text-xs text-stone-800 focus:border-emerald-600 focus:outline-none dark:text-stone-200"
+              className="select select-bordered select-sm font-normal"
             >
               <option value="ALL">Semua Status</option>
               <option value="REGISTERED">Terdaftar Saja</option>
-              <option value="UNREGISTERED">Tidak Terdaftar (Bablas)</option>
+              <option value="UNREGISTERED">Tamu Saja</option>
             </select>
 
             {!readOnly && (
@@ -937,21 +934,21 @@ export default function ReportsSummary({ workspace = 'piloting', readOnly = fals
                 onClick={() =>
                   setLogModal({ open: true, mode: 'create', initialLog: null, prefillUserId: '' })
                 }
-                className="inline-flex h-8 items-center justify-center gap-1.5 rounded-md bg-emerald-600 px-3 text-xs font-medium text-white hover:bg-emerald-700"
+                className="btn btn-sm btn-primary gap-1.5"
               >
                 <Plus className="h-3.5 w-3.5" />
-                <span>Tambah Log Manual</span>
+                <span>Tambah Log</span>
               </button>
             )}
           </div>
         </div>
 
-        <div className="overflow-hidden rounded-2xl border border-base-300 bg-base-100 shadow-sm">
-          {/* Mobile Log Cards (Zero horizontal scroll) */}
+        <div className="overflow-hidden rounded-box border border-base-300 bg-base-100">
+          {/* Mobile Log Cards */}
           <div className="divide-y divide-base-300 md:hidden">
             {logs.length === 0 ? (
-              <div className="px-4 py-8 text-center text-xs text-stone-500">
-                Tidak ada log masuk untuk filter yang dipilih.
+              <div className="px-4 py-8 text-center text-xs text-base-content/60">
+                Tidak ada log ditemukan.
               </div>
             ) : (
               logs.map((log) => (
@@ -960,10 +957,10 @@ export default function ReportsSummary({ workspace = 'piloting', readOnly = fals
                     <img
                       src={log.snapshotBase64}
                       alt={log.personName}
-                      className="h-10 w-10 shrink-0 rounded-xl object-cover"
+                      className="h-10 w-10 shrink-0 rounded-box object-cover"
                     />
                   ) : (
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-stone-100 text-stone-500 dark:bg-stone-800 dark:text-stone-400">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-box bg-base-200 text-base-content/50">
                       {log.status === 'REGISTERED' ? (
                         <UserCheck className="h-4 w-4" />
                       ) : (
@@ -973,11 +970,11 @@ export default function ReportsSummary({ workspace = 'piloting', readOnly = fals
                   )}
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between gap-2">
-                      <span className="truncate text-sm font-bold text-base-content">
+                      <span className="truncate text-sm font-semibold text-base-content">
                         {log.personName}
                       </span>
                       <div className="flex shrink-0 items-center gap-1.5">
-                        <span className="text-[11px] font-medium text-base-content/60">
+                        <span className="text-[11px] text-base-content/60">
                           {new Date(log.enteredAt).toLocaleTimeString('id-ID')}
                         </span>
                         {!readOnly && (
@@ -987,7 +984,7 @@ export default function ReportsSummary({ workspace = 'piloting', readOnly = fals
                               onClick={() =>
                                 setLogModal({ open: true, mode: 'edit', initialLog: log, prefillUserId: '' })
                               }
-                              className="rounded border border-base-300 p-1 text-sky-600 hover:bg-base-200"
+                              className="btn btn-xs btn-ghost border border-base-300 btn-square"
                               title="Edit Log"
                             >
                               <Edit3 className="h-3 w-3" />
@@ -995,7 +992,7 @@ export default function ReportsSummary({ workspace = 'piloting', readOnly = fals
                             <button
                               type="button"
                               onClick={() => handleDeleteLogFromReport(log)}
-                              className="rounded border border-base-300 p-1 text-rose-600 hover:bg-rose-50"
+                              className="btn btn-xs btn-ghost border border-base-300 text-error btn-square"
                               title="Hapus Log"
                             >
                               <Trash2 className="h-3 w-3" />
@@ -1009,21 +1006,19 @@ export default function ReportsSummary({ workspace = 'piloting', readOnly = fals
                     </div>
                     <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
                       <span
-                        className={`whitespace-nowrap rounded-full px-2 py-0.5 text-[11px] font-semibold ${
-                          log.status === 'REGISTERED'
-                            ? 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:ring-0'
-                            : 'bg-amber-50 text-amber-700 ring-1 ring-amber-200 dark:bg-amber-500/15 dark:text-amber-300 dark:ring-0'
+                        className={`badge badge-xs ${
+                          log.status === 'REGISTERED' ? 'badge-success badge-outline' : 'badge-warning badge-outline'
                         }`}
                       >
-                        {log.status === 'REGISTERED' ? 'Terdaftar' : 'Bablas'}
+                        {log.status === 'REGISTERED' ? 'Terdaftar' : 'Tamu'}
                       </span>
                       {log.sessionLabel && (
-                        <span className="badge badge-xs badge-outline font-semibold">
+                        <span className="badge badge-xs badge-outline">
                           {log.sessionLabel}
                         </span>
                       )}
                       {log.status === 'REGISTERED' && (
-                        <span className="text-[11px] font-medium text-sky-600 dark:text-sky-300">
+                        <span className="text-[11px] text-base-content/75">
                           Kemiripan: {log.confidence}%
                         </span>
                       )}
@@ -1041,41 +1036,41 @@ export default function ReportsSummary({ workspace = 'piloting', readOnly = fals
 
           {/* Desktop Log Table */}
           <div className="hidden overflow-x-auto md:block">
-            <table className="w-full text-left text-sm">
-              <thead className="border-b border-stone-200 bg-base-200 text-xs uppercase text-base-content/60 border-base-300">
+            <table className="table table-sm w-full">
+              <thead className="bg-base-200 text-xs text-base-content/70">
                 <tr>
-                  <th className="px-4 py-3">Jam Masuk</th>
-                  <th className="px-4 py-3">Foto &amp; Nama</th>
-                  <th className="px-4 py-3">ID / Divisi</th>
-                  <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3">Kemiripan</th>
-                  <th className="px-4 py-3">Catatan</th>
-                  {!readOnly && <th className="px-4 py-3 text-right">Aksi</th>}
+                  <th>Jam Masuk</th>
+                  <th>Foto &amp; Nama</th>
+                  <th>Nomor Induk / Bagian</th>
+                  <th>Status</th>
+                  <th>Kemiripan</th>
+                  <th>Catatan</th>
+                  {!readOnly && <th className="text-right">Aksi</th>}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-base-300">
+              <tbody>
                 {logs.length === 0 ? (
                   <tr>
-                    <td colSpan={readOnly ? 6 : 7} className="px-4 py-8 text-center text-xs text-stone-500">
-                      Tidak ada log masuk untuk filter yang dipilih.
+                    <td colSpan={readOnly ? 6 : 7} className="px-4 py-8 text-center text-xs text-base-content/60">
+                      Tidak ada log ditemukan.
                     </td>
                   </tr>
                 ) : (
                   logs.map((log) => (
-                    <tr key={log._id} className="hover:bg-stone-50 dark:hover:bg-stone-800/30">
-                      <td className="whitespace-nowrap px-4 py-3 text-xs font-medium text-base-content/75">
+                    <tr key={log._id} className="hover">
+                      <td className="whitespace-nowrap text-xs text-base-content/75">
                         {new Date(log.enteredAt).toLocaleTimeString('id-ID')}
                       </td>
-                      <td className="px-4 py-3">
+                      <td>
                         <div className="flex items-center gap-2.5">
                           {log.snapshotBase64 ? (
                             <img
                               src={log.snapshotBase64}
                               alt={log.personName}
-                              className="h-8 w-8 rounded object-cover"
+                              className="h-8 w-8 rounded-box object-cover"
                             />
                           ) : (
-                            <div className="flex h-8 w-8 items-center justify-center rounded bg-stone-100 text-stone-500 dark:bg-stone-800 dark:text-stone-400">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-box bg-base-200 text-base-content/50">
                               {log.status === 'REGISTERED' ? (
                                 <UserCheck className="h-4 w-4" />
                               ) : (
@@ -1088,35 +1083,33 @@ export default function ReportsSummary({ workspace = 'piloting', readOnly = fals
                           </span>
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-xs text-base-content/60">
+                      <td className="text-xs text-base-content/60">
                         {log.identifier} • {log.department}{log.wilayah ? ` • ${formatWilayahLabel(log.wilayah)}` : ''}
                       </td>
-                      <td className="px-4 py-3">
+                      <td>
                         <span
-                          className={`whitespace-nowrap rounded border px-2 py-0.5 text-[11px] font-semibold ${
-                            log.status === 'REGISTERED'
-                              ? 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300'
-                              : 'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-950/60 dark:text-amber-300'
+                          className={`badge badge-sm ${
+                            log.status === 'REGISTERED' ? 'badge-success badge-outline' : 'badge-warning badge-outline'
                           }`}
                         >
-                          {log.status === 'REGISTERED' ? 'Terdaftar' : 'Tidak Terdaftar (Bablas)'}
+                          {log.status === 'REGISTERED' ? 'Terdaftar' : 'Tamu'}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-xs text-base-content/75">
+                      <td className="text-xs text-base-content/75">
                         {log.status === 'REGISTERED' ? `${log.confidence}%` : '-'}
                       </td>
-                      <td className="px-4 py-3 text-xs text-base-content/60">
+                      <td className="text-xs text-base-content/60">
                         {log.notes}
                       </td>
                       {!readOnly && (
-                        <td className="px-4 py-3 text-right">
+                        <td className="text-right">
                           <div className="inline-flex items-center gap-1">
                             <button
                               type="button"
                               onClick={() =>
                                 setLogModal({ open: true, mode: 'edit', initialLog: log, prefillUserId: '' })
                               }
-                              className="rounded border border-base-300 bg-base-100 p-1 text-sky-600 hover:bg-base-200"
+                              className="btn btn-xs btn-ghost border border-base-300 btn-square"
                               title="Edit Log"
                             >
                               <Edit3 className="h-3.5 w-3.5" />
@@ -1124,7 +1117,7 @@ export default function ReportsSummary({ workspace = 'piloting', readOnly = fals
                             <button
                               type="button"
                               onClick={() => handleDeleteLogFromReport(log)}
-                              className="rounded border border-base-300 bg-base-100 p-1 text-rose-600 hover:bg-rose-50"
+                              className="btn btn-xs btn-ghost border border-base-300 text-error btn-square"
                               title="Hapus Log"
                             >
                               <Trash2 className="h-3.5 w-3.5" />

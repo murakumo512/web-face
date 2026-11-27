@@ -32,11 +32,11 @@ import { api } from './services/api.js';
 import { loadFaceModels } from './services/faceService.js';
 
 const ADMIN_TABS = [
-  { id: 'admin', fallback: 'Dashboard CRUD', shortLabel: 'Data', icon: LayoutDashboard, writeRequired: false },
-  { id: 'register', fallback: 'Registrasi Wajah', shortLabel: 'Daftar', icon: UserPlus, writeRequired: true },
-  { id: 'reports', fallback: 'Laporan & PDF', shortLabel: 'Laporan', icon: FileSpreadsheet, writeRequired: false },
-  { id: 'live', fallback: 'Live & Test Foto', shortLabel: 'Live', icon: Camera, writeRequired: false },
-  { id: 'cpanel', fallback: 'cPanel & CMS', shortLabel: 'cPanel', icon: Settings2, writeRequired: true },
+  { id: 'admin', fallback: 'Data Anggota', shortLabel: 'Data', icon: LayoutDashboard, writeRequired: false },
+  { id: 'register', fallback: 'Registrasi', shortLabel: 'Daftar', icon: UserPlus, writeRequired: true },
+  { id: 'reports', fallback: 'Laporan', shortLabel: 'Laporan', icon: FileSpreadsheet, writeRequired: false },
+  { id: 'live', fallback: 'Kamera Live', shortLabel: 'Live', icon: Camera, writeRequired: false },
+  { id: 'cpanel', fallback: 'Pengaturan', shortLabel: 'Atur', icon: Settings2, writeRequired: true },
 ];
 
 function resolveRoute(pathname) {
@@ -50,8 +50,11 @@ function resolveRoute(pathname) {
   if (clean === '/register') {
     return { view: 'register', workspace: 'piloting', defaultTab: 'admin' };
   }
-  if (clean === '/testing' || clean === '/testing/live') {
-    return { view: 'live', workspace: 'piloting', defaultTab: 'admin', skipSchedule: true };
+  if (clean.startsWith('/testing')) {
+    if (clean === '/testing/admin') return { view: 'admin', workspace: 'testing', defaultTab: 'admin' };
+    if (clean === '/testing/cpanel') return { view: 'admin', workspace: 'testing', defaultTab: 'cpanel' };
+    if (clean === '/testing/register') return { view: 'register', workspace: 'testing', defaultTab: 'admin' };
+    return { view: 'live', workspace: 'testing', defaultTab: 'admin', skipSchedule: true };
   }
   if (clean.startsWith('/gereja')) {
     if (clean === '/gereja/admin') return { view: 'admin', workspace: 'gereja', defaultTab: 'admin' };
@@ -154,7 +157,9 @@ export default function App() {
   const handleQuickRegister = useCallback(
     (facePayload) => {
       setPrefillFace(facePayload);
-      const targetWs = facePayload?.workspace === 'gereja' ? 'gereja' : workspace;
+      const targetWs = ['gereja', 'piloting', 'testing'].includes(facePayload?.workspace)
+        ? facePayload.workspace
+        : workspace;
       if (facePayload?.fromAdmin) {
         navigateTo(`/${targetWs}/admin`, 'register');
       } else {
@@ -172,20 +177,20 @@ export default function App() {
   // Public Standalone Face Registration Route (No Login Required!)
   if (route.view === 'register') {
     return (
-      <div className="prime-admin-shell min-h-screen bg-base-200 text-base-content">
+      <div className="min-h-[100dvh] bg-base-200 text-base-content">
         <header className="sticky top-0 z-30 border-b border-base-300 bg-base-100">
           <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-3 px-4 sm:px-6">
             <div className="flex min-w-0 items-center gap-2.5">
               <button
                 type="button"
                 onClick={() => navigateTo('/')}
-                className="btn btn-sm btn-square btn-ghost border border-base-300 shadow-none shrink-0"
-                title="Kembali ke Portal Utama (/)"
+                className="btn btn-sm btn-square btn-ghost border border-base-300 shrink-0"
+                title="Kembali"
               >
                 <ArrowLeft className="h-4 w-4" />
               </button>
               <span className="truncate text-sm font-semibold text-base-content sm:text-base">
-                Registrasi Wajah · {workspace === 'gereja' ? 'Gereja' : 'Piloting'}
+                Registrasi · {wsMeta.shortLabel}
               </span>
             </div>
 
@@ -193,10 +198,10 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => navigateTo(wsMeta.livePath)}
-                className="btn btn-sm btn-success text-white shadow-none font-medium gap-1.5"
+                className="btn btn-sm btn-primary font-medium gap-1.5"
               >
-                <Maximize2 className="h-3.5 w-3.5" />
-                <span>Kamera {workspace === 'gereja' ? 'Gereja' : 'Piloting'}</span>
+                <Camera className="h-3.5 w-3.5" />
+                <span>Kamera {wsMeta.shortLabel}</span>
               </button>
             </div>
           </div>
@@ -257,33 +262,31 @@ export default function App() {
     );
   }
 
-  const otherWorkspace = workspace === 'gereja' ? 'piloting' : 'gereja';
-  const otherMeta = getWorkspaceMeta(otherWorkspace);
+  const workspaceList = ['gereja', 'piloting', 'testing'];
   const wsCfg = config.workspaces?.[workspace] || {};
   const visibleTabs = ADMIN_TABS.filter((tab) => !isReadOnly || !tab.writeRequired);
 
   return (
-    <div className="prime-admin-shell min-h-[100dvh] bg-base-200 text-base-content">
-      {/* PrimeVue-inspired Clean Admin Menubar & Responsive Navigation */}
-      <header className="sticky top-0 z-30 border-b border-base-300 bg-base-100/95 backdrop-blur-sm">
+    <div className="min-h-[100dvh] bg-base-200 text-base-content">
+      <header className="sticky top-0 z-30 border-b border-base-300 bg-base-100">
         <div className="mx-auto flex max-w-7xl flex-col gap-2 px-3 py-2 sm:gap-2.5 sm:px-6 sm:py-3 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-center justify-between gap-2">
             <div className="flex min-w-0 items-center gap-2">
               <button
                 type="button"
                 onClick={() => navigateTo('/')}
-                className="btn btn-sm btn-square btn-ghost border border-base-300 shadow-none shrink-0"
-                title="Kembali ke Portal (/)"
-                aria-label="Kembali ke Portal Utama"
+                className="btn btn-sm btn-square btn-ghost border border-base-300 shrink-0"
+                title="Kembali"
+                aria-label="Kembali"
               >
                 <ArrowLeft className="h-4 w-4" />
               </button>
 
               <div className="flex min-w-0 items-center gap-2">
                 <h1 className="truncate text-sm font-semibold text-base-content sm:text-base">
-                  {workspace === 'gereja' ? 'Gereja' : 'Piloting'} · Admin
+                  {wsMeta.shortLabel} · Admin
                 </h1>
-                <span className="hidden badge badge-ghost badge-sm border-base-300 font-medium text-base-content/75 sm:inline-flex">
+                <span className="hidden badge badge-ghost badge-sm border-base-300 font-normal text-base-content/75 sm:inline-flex">
                   {isReadOnly
                     ? `Read-Only (${currentUser?.username || 'admin'})`
                     : currentUser?.username || 'admin'}
@@ -295,8 +298,8 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => navigateTo(wsMeta.livePath)}
-                className="btn btn-sm btn-success text-white shadow-none font-medium gap-1 px-2.5"
-                title={`Buka Kamera ${workspace === 'gereja' ? 'Gereja' : 'Piloting'}`}
+                className="btn btn-sm btn-primary font-medium gap-1 px-2.5"
+                title={`Buka Kamera ${wsMeta.shortLabel}`}
               >
                 <Camera className="h-3.5 w-3.5" />
                 <span className="text-xs">Kamera</span>
@@ -305,38 +308,50 @@ export default function App() {
             </div>
           </div>
 
-          {/* Single-row scrollable strip on mobile so header stays compact; normal wrap on lg+ */}
           <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5 lg:flex-wrap lg:overflow-visible lg:pb-0">
             <button
               type="button"
               onClick={() => navigateTo(wsMeta.livePath)}
-              className="hidden lg:inline-flex btn btn-sm btn-success text-white shadow-none font-medium gap-1.5 shrink-0"
+              className="hidden lg:inline-flex btn btn-sm btn-primary font-medium gap-1.5 shrink-0"
             >
-              <Maximize2 className="h-3.5 w-3.5" />
-              <span>Kamera {workspace === 'gereja' ? 'Gereja' : 'Piloting'}</span>
+              <Camera className="h-3.5 w-3.5" />
+              <span>Kamera {wsMeta.shortLabel}</span>
             </button>
 
-            <button
-              type="button"
-              onClick={() => navigateTo(otherMeta.adminPath, activeTab)}
-              className="btn btn-sm btn-ghost border border-base-300 shadow-none font-medium shrink-0 whitespace-nowrap"
-            >
-              <span>Beralih: {otherWorkspace === 'gereja' ? 'Gereja' : 'Piloting'}</span>
-            </button>
+            <div className="join shrink-0">
+              {workspaceList.map((wsKey) => {
+                const itemMeta = getWorkspaceMeta(wsKey);
+                const active = workspace === wsKey;
+                return (
+                  <button
+                    key={wsKey}
+                    type="button"
+                    onClick={() => navigateTo(itemMeta.adminPath, activeTab)}
+                    className={`btn btn-sm join-item font-medium whitespace-nowrap ${
+                      active
+                        ? 'btn-neutral'
+                        : 'btn-ghost border border-base-300 font-normal'
+                    }`}
+                  >
+                    {itemMeta.shortLabel}
+                  </button>
+                );
+              })}
+            </div>
 
             {actualRole === 'admin' && (
               <button
                 type="button"
                 onClick={() => setPreviewReadOnly((v) => !v)}
-                className={`btn btn-sm shadow-none font-medium gap-1.5 shrink-0 whitespace-nowrap ${
+                className={`btn btn-sm font-normal gap-1.5 shrink-0 whitespace-nowrap ${
                   previewReadOnly
                     ? 'btn-warning'
                     : 'btn-ghost border border-base-300'
                 }`}
-                title="Uji atau aktifkan sementara Mode Read-Only"
+                title="Mode Read-Only"
               >
                 <Eye className="h-3.5 w-3.5" />
-                <span>{previewReadOnly ? 'Keluar Read-Only' : 'Mode Read'}</span>
+                <span>{previewReadOnly ? 'Keluar Read-Only' : 'Mode Baca'}</span>
               </button>
             )}
 
@@ -352,15 +367,14 @@ export default function App() {
             </div>
 
             <span
-              className={`inline-flex btn btn-sm btn-ghost pointer-events-none border shadow-none font-medium text-xs gap-1.5 shrink-0 whitespace-nowrap ${
+              className={`inline-flex btn btn-sm btn-ghost pointer-events-none border font-normal text-xs gap-1.5 shrink-0 whitespace-nowrap ${
                 dbStatus.connected
-                  ? 'border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300'
-                  : 'border-amber-300 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-950/60 dark:text-amber-300'
+                  ? 'border-base-300 text-success'
+                  : 'border-base-300 text-warning'
               }`}
-              title={`Browser Biometrik: ${modelsReady ? 'Siap' : modelsError || 'Memuat...'}`}
             >
               <Database className="h-3.5 w-3.5" />
-              <span>{dbStatus.connected ? 'DB OK' : 'DB Offline'}</span>
+              <span>{dbStatus.connected ? 'Terhubung' : 'Offline'}</span>
             </span>
 
             <div className="hidden lg:block shrink-0">
@@ -370,8 +384,8 @@ export default function App() {
             <button
               type="button"
               onClick={() => setPwdModalOpen(true)}
-              className="btn btn-sm btn-ghost border border-base-300 shadow-none font-medium gap-1.5 shrink-0 whitespace-nowrap"
-              title="Ganti password akun Anda"
+              className="btn btn-sm btn-ghost border border-base-300 font-normal gap-1.5 shrink-0 whitespace-nowrap"
+              title="Ganti password"
             >
               <KeyRound className="h-3.5 w-3.5" />
               <span>Password</span>
@@ -381,8 +395,8 @@ export default function App() {
               <button
                 type="button"
                 onClick={logoutAdmin}
-                className="btn btn-sm btn-ghost border border-base-300 text-error hover:bg-error/10 shadow-none font-medium gap-1.5 shrink-0 whitespace-nowrap"
-                title="Keluar sesi"
+                className="btn btn-sm btn-ghost border border-base-300 text-error hover:bg-error/10 font-normal gap-1.5 shrink-0 whitespace-nowrap"
+                title="Keluar"
               >
                 <LogOut className="h-3.5 w-3.5" />
                 <span>Keluar</span>
@@ -391,7 +405,6 @@ export default function App() {
           </div>
         </div>
 
-        {/* Desktop / Tablet Underlined TabMenu */}
         <div className="hidden md:block mx-auto max-w-7xl border-t border-base-200 px-4 sm:px-6">
           <nav className="-mb-px flex gap-1 overflow-x-auto" aria-label="Navigasi Admin">
             {visibleTabs.map((tab) => {
@@ -404,7 +417,7 @@ export default function App() {
                   onClick={() => setActiveTab(tab.id)}
                   className={`inline-flex items-center gap-1.5 border-b-2 px-3 py-2.5 text-xs font-medium whitespace-nowrap transition ${
                     active
-                      ? 'border-emerald-600 text-emerald-700 dark:border-emerald-400 dark:text-emerald-400 font-semibold'
+                      ? 'border-primary text-primary font-semibold'
                       : 'border-transparent text-base-content/65 hover:border-base-300 hover:text-base-content'
                   }`}
                 >
@@ -417,7 +430,6 @@ export default function App() {
         </div>
       </header>
 
-      {/* Main Content (extra bottom padding on mobile for fixed bottom nav) */}
       <main className="mx-auto max-w-7xl space-y-5 px-3 py-4 pb-20 sm:space-y-6 sm:px-6 sm:py-6 md:pb-6">
         {isReadOnly && (
           <div className="alert border border-warning/40 bg-warning/10 text-xs sm:text-sm">
@@ -479,7 +491,7 @@ export default function App() {
 
       {/* Mobile Bottom Navigation Bar */}
       <nav
-        className="fixed inset-x-0 bottom-0 z-40 border-t border-base-300 bg-base-100/95 backdrop-blur-md md:hidden"
+        className="fixed inset-x-0 bottom-0 z-40 border-t border-base-300 bg-base-100 md:hidden"
         aria-label="Navigasi Bawah Admin"
       >
         <div
@@ -497,14 +509,14 @@ export default function App() {
                   setActiveTab(tab.id);
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
-                className={`relative flex flex-col items-center justify-center gap-0.5 px-1 text-[10px] font-medium transition active:scale-95 ${
+                className={`relative flex flex-col items-center justify-center gap-0.5 px-1 text-[10px] font-medium transition ${
                   active
-                    ? 'text-emerald-600 dark:text-emerald-400 font-semibold'
+                    ? 'text-primary font-semibold'
                     : 'text-base-content/60 hover:text-base-content'
                 }`}
               >
                 {active && (
-                  <span className="absolute inset-x-3 top-0 h-0.5 rounded-b bg-emerald-600 dark:bg-emerald-400" />
+                  <span className="absolute inset-x-3 top-0 h-0.5 rounded-b bg-primary" />
                 )}
                 <Icon className="h-4 w-4 shrink-0" />
                 <span className="truncate max-w-full">{tab.shortLabel}</span>

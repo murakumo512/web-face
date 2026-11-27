@@ -173,12 +173,11 @@ export default function CPanelSettings({ onNavigate }) {
 
   return (
     <div className="space-y-6">
-      {/* Header Banner */}
-      <div className="card border border-base-300 bg-base-100 shadow-sm">
-        <div className="card-body flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
+      <div className="card border border-base-300 bg-base-100">
+        <div className="card-body flex-col gap-3 p-4 sm:p-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <div className="flex items-center gap-2">
-              <span className="badge badge-primary badge-sm font-bold">cPanel &amp; CMS</span>
+              <span className="badge badge-primary badge-sm">Pengaturan</span>
               {saveNotice && (
                 <span className="badge badge-success badge-sm gap-1">
                   <Check className="h-3 w-3" />
@@ -186,11 +185,11 @@ export default function CPanelSettings({ onNavigate }) {
                 </span>
               )}
             </div>
-            <h2 className="mt-1 text-lg font-bold text-base-content sm:text-xl">
-              Pusat Pengaturan Website, Tema DaisyUI &amp; Section Dinamis
+            <h2 className="mt-1 text-base font-semibold text-base-content sm:text-lg">
+              Pengaturan Sistem, Akun &amp; Tampilan
             </h2>
-            <p className="text-xs text-base-content/70 sm:text-sm">
-              Atur proteksi login `/admin` &amp; `/cpanel`, pilih tema DaisyUI, ubah semua teks, serta kelola section tambahan.
+            <p className="text-xs text-base-content/70">
+              Kelola login, akun pengguna, tema tampilan, dan teks halaman.
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2 shrink-0">
@@ -198,7 +197,7 @@ export default function CPanelSettings({ onNavigate }) {
               type="button"
               onClick={resetConfig}
               disabled={savingConfig}
-              className="btn btn-sm btn-outline border-base-300 gap-1.5"
+              className="btn btn-sm btn-ghost border border-base-300 gap-1.5 font-normal"
             >
               <RotateCcw className="h-3.5 w-3.5" />
               Reset Default
@@ -210,45 +209,45 @@ export default function CPanelSettings({ onNavigate }) {
               className="btn btn-sm btn-primary gap-1.5"
             >
               <Save className="h-3.5 w-3.5" />
-              {savingConfig ? 'Menyimpan...' : 'Simpan Semua Perubahan'}
+              {savingConfig ? 'Menyimpan...' : 'Simpan'}
             </button>
           </div>
         </div>
       </div>
 
       {feedback && (
-        <div className="alert alert-info py-3 text-sm">
+        <div className="alert alert-info py-2.5 text-xs sm:text-sm">
           <span>{feedback}</span>
         </div>
       )}
 
       {/* 1. Keamanan & Toggle Enable / Disable Login */}
-      <section className="card border border-base-300 bg-base-100 shadow-sm">
-        <div className="card-body gap-4 p-5 sm:p-6">
+      <section className="card border border-base-300 bg-base-100">
+        <div className="card-body gap-4 p-4 sm:p-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-start gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                <Shield className="h-5 w-5" />
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-box border border-base-300 bg-base-200 text-primary">
+                <Shield className="h-4 w-4" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-base-content">
-                  Keamanan &amp; Proteksi Login (`/admin` &amp; `/cpanel`)
+                <h3 className="text-sm sm:text-base font-semibold text-base-content">
+                  Proteksi Login Admin
                 </h3>
                 <p className="text-xs text-base-content/70">
-                  Aktifkan agar halaman Admin &amp; cPanel meminta login. Matikan jika ingin akses langsung tanpa login.
+                  Wajibkan login sebelum masuk halaman Admin &amp; Pengaturan.
                 </p>
               </div>
             </div>
 
-            <label className="label cursor-pointer gap-3 rounded-xl border border-base-300 bg-base-200 px-4 py-2.5 shrink-0">
-              <span className="label-text text-xs font-bold">
-                {draft.authEnabled ? 'Login Aktif (Wajib Login)' : 'Login Dimatikan (Bebas Akses)'}
+            <label className="label cursor-pointer gap-3 rounded-box border border-base-300 bg-base-200 px-3.5 py-2 shrink-0">
+              <span className="label-text text-xs font-medium">
+                {draft.authEnabled ? 'Login Aktif' : 'Bebas Akses'}
               </span>
               <input
                 type="checkbox"
                 checked={Boolean(draft.authEnabled)}
                 onChange={(e) => handleToggleAuth(e.target.checked)}
-                className="toggle toggle-primary"
+                className="toggle toggle-primary toggle-sm"
               />
             </label>
           </div>
@@ -439,28 +438,27 @@ export default function CPanelSettings({ onNavigate }) {
         </div>
       </section>
 
-      {/* 2. DaisyUI Theme Controller (Dropdown default + collapsible gallery) */}
-      <section className="card border border-base-300 bg-base-100 shadow-sm">
-        <div className="card-body gap-3 p-5 sm:p-6">
+      <section className="card border border-base-300 bg-base-100">
+        <div className="card-body gap-3 p-4 sm:p-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-2.5">
-              <Palette className="h-5 w-5 text-primary shrink-0" />
+              <Palette className="h-4 w-4 text-primary shrink-0" />
               <div>
-                <h3 className="text-base font-bold text-base-content">
-                  Tema DaisyUI ({DAISY_THEMES.length} Pilihan)
+                <h3 className="text-sm sm:text-base font-semibold text-base-content">
+                  Tema Tampilan ({DAISY_THEMES.length} Pilihan)
                 </h3>
                 <p className="text-xs text-base-content/70">
-                  Pilih tema lewat dropdown di samping atau buka pratinjau semua tema jika ingin melihat warna.
+                  Ubah warna tampilan aplikasi di semua halaman.
                 </p>
               </div>
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold opacity-70">Tema Aktif:</span>
+              <span className="text-xs opacity-70">Tema:</span>
               <select
                 value={activeTheme}
                 onChange={(e) => setActiveTheme(e.target.value)}
-                className="select select-bordered select-sm min-w-[160px] capitalize font-semibold"
+                className="select select-bordered select-sm min-w-[160px] capitalize font-medium"
               >
                 {DAISY_THEMES.map((t) => (
                   <option key={t.id} value={t.id}>
@@ -473,8 +471,8 @@ export default function CPanelSettings({ onNavigate }) {
 
           <div className="collapse collapse-arrow border border-base-300 bg-base-200/50">
             <input type="checkbox" />
-            <div className="collapse-title text-xs font-bold">
-              Lihat Preview Semua Tema ({DAISY_THEMES.length})
+            <div className="collapse-title text-xs font-medium">
+              Preview Warna Tema ({DAISY_THEMES.length})
             </div>
             <div className="collapse-content">
               <div className="grid grid-cols-2 gap-3 pt-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
@@ -525,24 +523,22 @@ export default function CPanelSettings({ onNavigate }) {
         </div>
       </section>
 
-      {/* 3. Dynamic Sections Builder (+ Add Section) */}
       <section className="space-y-3">
         <div className="flex items-center gap-2 px-1">
-          <LayoutGrid className="h-5 w-5 text-primary" />
-          <h3 className="text-base font-bold text-base-content">
-            Section Builder (Portal, Ruang Gereja &amp; Piloting)
+          <LayoutGrid className="h-4 w-4 text-primary" />
+          <h3 className="text-sm sm:text-base font-semibold text-base-content">
+            Konten Tambahan
           </h3>
         </div>
         <DynamicSections showAllTargets canManage onNavigate={onNavigate} />
       </section>
 
-      {/* 4. Editor Semua Tulisan Website */}
       <form onSubmit={handleSaveAll} className="space-y-3">
         <div className="flex items-center justify-between px-1">
           <div className="flex items-center gap-2">
-            <Type className="h-5 w-5 text-primary" />
-            <h3 className="text-base font-bold text-base-content">
-              Editor Semua Tulisan Website (Dynamic Texts)
+            <Type className="h-4 w-4 text-primary" />
+            <h3 className="text-sm sm:text-base font-semibold text-base-content">
+              Teks Halaman
             </h3>
           </div>
           <button type="submit" disabled={savingConfig} className="btn btn-sm btn-primary gap-1.5">
@@ -628,15 +624,17 @@ export default function CPanelSettings({ onNavigate }) {
           </div>
         </div>
 
-        {/* Group B: Ruang Gereja & Mode Piloting */}
-        {['gereja', 'piloting'].map((wsKey, idx) => {
+        {/* Group B: Ruang Gereja, Mode Piloting & Testing */}
+        {['gereja', 'piloting', 'testing'].map((wsKey, idx) => {
           const ws = draft.workspaces?.[wsKey] || {};
           const highlights = Array.isArray(ws.highlights) ? ws.highlights : ['', '', ''];
+          const wsLabel =
+            wsKey === 'gereja' ? 'Ruang Gereja' : wsKey === 'testing' ? 'Testing' : 'Mode Piloting';
           return (
             <div key={wsKey} className="collapse collapse-arrow border border-base-300 bg-base-100">
               <input type="checkbox" />
               <div className="collapse-title text-sm font-bold">
-                {idx + 2}. Teks Kartu, Admin &amp; Kamera — {wsKey === 'gereja' ? 'Ruang Gereja' : 'Mode Piloting'}
+                {idx + 2}. Teks Kartu, Admin &amp; Kamera — {wsLabel}
               </div>
               <div className="collapse-content space-y-3">
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">

@@ -223,8 +223,10 @@ router.post('/', rejectReadOnlyViewer, async (req, res) => {
     const created = await User.create({
       name: name.trim(),
       identifier: identifier.trim(),
-      department: department.trim() || (ws === 'gereja' ? 'Ibadah Umum' : 'Umum'),
-      role: role.trim() || (ws === 'gereja' ? 'Jemaat' : 'Anggota'),
+      department:
+        department.trim() ||
+        (ws === 'gereja' ? 'Ibadah Umum' : ws === 'testing' ? 'Testing' : 'Umum'),
+      role: role.trim() || (ws === 'gereja' ? 'Jemaat' : ws === 'testing' ? 'Tester' : 'Anggota'),
       wilayah: String(wilayah || '').trim(),
       workspace: ws,
       faceDescriptors: hasBrowserDesc ? descriptorsToSave : [],

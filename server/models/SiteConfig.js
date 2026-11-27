@@ -102,6 +102,23 @@ export const DEFAULT_SITE_CONFIG = {
         'Tetap lengkap dengan pencatatan anti-duplikat 1x/hari & laporan periode',
       ],
     },
+    testing: {
+      shortLabel: 'Testing',
+      eyebrow: 'UJI COBA KAMERA',
+      title: 'Testing Kamera',
+      subtitle: 'Ruang terpisah untuk uji kamera, akurasi deteksi wajah, dan eksperimen.',
+      adminTitle: 'Testing — Panel Admin',
+      adminSubtitle: 'Kelola Data Testing, Log Uji Kamera, dan Export CSV / PDF',
+      primaryButton: 'Kamera Testing',
+      secondaryButton: 'Admin Testing',
+      cameraReadyTitle: 'Testing Kamera — Siap',
+      cameraReadySubtitle: 'Arahkan wajah ke kamera untuk menguji deteksi dan pencocokan.',
+      roleOptions: ['Tester', 'Pengembang', 'Tamu'],
+      highlights: [
+        'Database khusus testing, terpisah dari Gereja dan Piloting',
+        'Bebas uji coba daftar wajah & log tanpa mengganggu data produksi',
+      ],
+    },
   },
   customSections: [
     {
@@ -149,7 +166,7 @@ const customSectionSchema = new mongoose.Schema(
     id: { type: String, required: true, trim: true },
     target: {
       type: String,
-      enum: ['portal', 'gereja', 'piloting'],
+      enum: ['portal', 'gereja', 'piloting', 'testing'],
       default: 'portal',
     },
     layout: {

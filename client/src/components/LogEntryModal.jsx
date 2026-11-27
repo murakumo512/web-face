@@ -140,27 +140,21 @@ export default function LogEntryModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
-      <div className="w-full max-w-md rounded-md border border-base-300 bg-base-100 p-5 shadow-lg">
+    <div className="modal modal-open z-50">
+      <div className="modal-box max-w-md border border-base-300 bg-base-100 p-5">
         <div className="flex items-center justify-between border-b border-base-300 pb-3">
           <div className="flex items-center gap-2">
             <h3 className="text-sm font-semibold text-base-content">
-              {mode === 'edit' ? 'Edit Data Log / Rekap' : 'Tambah Log Manual'}
+              {mode === 'edit' ? 'Edit Log' : 'Tambah Log'}
             </h3>
-            <span
-              className={`rounded border px-1.5 py-0.5 text-[11px] font-medium ${
-                sessionLabel === 'Gereja Pagi'
-                  ? 'border-sky-200 bg-sky-50 text-sky-700 dark:border-sky-800 dark:bg-sky-950/60 dark:text-sky-300'
-                  : 'border-indigo-200 bg-indigo-50 text-indigo-700 dark:border-indigo-800 dark:bg-indigo-950/60 dark:text-indigo-300'
-              }`}
-            >
+            <span className="badge badge-outline badge-sm font-medium">
               {sessionLabel}
             </span>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="rounded p-1 text-base-content/60 hover:bg-base-200 hover:text-base-content"
+            className="btn btn-ghost btn-xs btn-square"
           >
             <X className="h-4 w-4" />
           </button>
@@ -168,8 +162,8 @@ export default function LogEntryModal({
 
         <form onSubmit={handleSubmit} className="mt-4 space-y-3">
           <div>
-            <span className="mb-1 block text-xs font-medium text-base-content/75">Jenis Entri</span>
-            <div className="grid grid-cols-2 gap-2">
+            <span className="mb-1 block text-xs font-medium text-base-content/75">Jenis</span>
+            <div className="join grid w-full grid-cols-2">
               <button
                 type="button"
                 onClick={() => {
@@ -178,13 +172,11 @@ export default function LogEntryModal({
                     handleSelectExistingUser(String(users[0]._id));
                   }
                 }}
-                className={`h-8 rounded-md border text-xs font-medium transition ${
-                  entryType === 'REGISTERED'
-                    ? 'border-emerald-600 bg-emerald-600 text-white'
-                    : 'border-base-300 bg-base-100 text-base-content hover:bg-base-200'
+                className={`btn btn-sm join-item font-normal ${
+                  entryType === 'REGISTERED' ? 'btn-primary' : 'btn-ghost border border-base-300'
                 }`}
               >
-                Dari Data Terdaftar
+                Anggota Terdaftar
               </button>
               <button
                 type="button"
@@ -193,10 +185,8 @@ export default function LogEntryModal({
                   setSelectedUserId('');
                   if (!personName) setPersonName(wsMeta.unregisteredLabel);
                 }}
-                className={`h-8 rounded-md border text-xs font-medium transition ${
-                  entryType === 'UNREGISTERED'
-                    ? 'border-amber-600 bg-amber-600 text-white'
-                    : 'border-base-300 bg-base-100 text-base-content hover:bg-base-200'
+                className={`btn btn-sm join-item font-normal ${
+                  entryType === 'UNREGISTERED' ? 'btn-warning' : 'btn-ghost border border-base-300'
                 }`}
               >
                 Tamu / Manual
@@ -205,17 +195,17 @@ export default function LogEntryModal({
           </div>
 
           {entryType === 'REGISTERED' && (
-            <label className="block space-y-1">
-              <span className="text-xs font-medium text-base-content/75">
+            <label className="form-control">
+              <span className="label-text mb-1 text-xs font-medium">
                 Pilih {wsMeta.memberNoun}
               </span>
               <select
                 value={selectedUserId}
                 onChange={(e) => handleSelectExistingUser(e.target.value)}
                 required
-                className="h-9 w-full rounded-md border border-base-300 bg-base-100 px-2.5 text-xs text-base-content focus:border-emerald-600 focus:outline-none"
+                className="select select-bordered select-sm w-full"
               >
-                <option value="">-- Pilih dari data tersimpan --</option>
+                <option value="">-- Pilih --</option>
                 {users.map((u) => (
                   <option key={u._id} value={String(u._id)}>
                     {u.name} {u.identifier ? `(${u.identifier})` : ''}{u.wilayah ? ` • ${formatWilayahLabel(u.wilayah)}` : ''}
@@ -225,79 +215,79 @@ export default function LogEntryModal({
             </label>
           )}
 
-          <label className="block space-y-1">
-            <span className="text-xs font-medium text-base-content/75">Nama Tampil di Log</span>
+          <label className="form-control">
+            <span className="label-text mb-1 text-xs font-medium">Nama</span>
             <input
               type="text"
               required
               value={personName}
               onChange={(e) => setPersonName(e.target.value)}
               placeholder={entryType === 'REGISTERED' ? 'Nama lengkap' : 'Nama tamu / keterangan'}
-              className="h-9 w-full rounded-md border border-base-300 bg-base-100 px-2.5 text-xs text-base-content focus:border-emerald-600 focus:outline-none"
+              className="input input-bordered input-sm w-full"
             />
           </label>
 
           <div className="grid grid-cols-2 gap-3">
-            <label className="block space-y-1">
-              <span className="flex items-center gap-1 text-xs font-medium text-base-content/75">
+            <label className="form-control">
+              <span className="label-text mb-1 flex items-center gap-1 text-xs font-medium">
                 <Calendar className="h-3.5 w-3.5" />
-                Tanggal Ibadah
+                Tanggal
               </span>
               <input
                 type="date"
                 required
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="h-9 w-full rounded-md border border-base-300 bg-base-100 px-2.5 text-xs text-base-content focus:border-emerald-600 focus:outline-none"
+                className="input input-bordered input-sm w-full"
               />
             </label>
 
-            <label className="block space-y-1">
-              <span className="flex items-center gap-1 text-xs font-medium text-base-content/75">
+            <label className="form-control">
+              <span className="label-text mb-1 flex items-center gap-1 text-xs font-medium">
                 <Clock className="h-3.5 w-3.5" />
-                Jam Ibadah
+                Jam
               </span>
               <input
                 type="time"
                 required
                 value={sessionTime}
                 onChange={(e) => setSessionTime(e.target.value)}
-                className="h-9 w-full rounded-md border border-base-300 bg-base-100 px-2.5 text-xs text-base-content focus:border-emerald-600 focus:outline-none"
+                className="input input-bordered input-sm w-full"
               />
             </label>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
-            <label className="block space-y-1">
-              <span className="text-xs font-medium text-base-content/75">Divisi / Keterangan</span>
+            <label className="form-control">
+              <span className="label-text mb-1 text-xs font-medium">Bagian / Komisi</span>
               <input
                 type="text"
                 value={department}
                 onChange={(e) => setDepartment(e.target.value)}
-                className="h-9 w-full rounded-md border border-base-300 bg-base-100 px-2.5 text-xs text-base-content focus:border-emerald-600 focus:outline-none"
+                className="input input-bordered input-sm w-full"
               />
             </label>
 
-            <label className="block space-y-1">
-              <span className="text-xs font-medium text-base-content/75">Wilayah</span>
+            <label className="form-control">
+              <span className="label-text mb-1 text-xs font-medium">Wilayah</span>
               <input
                 type="text"
                 value={wilayah}
                 onChange={(e) => setWilayah(e.target.value)}
                 placeholder="Mis. Wilayah 3"
-                className="h-9 w-full rounded-md border border-base-300 bg-base-100 px-2.5 text-xs text-base-content focus:border-emerald-600 focus:outline-none"
+                className="input input-bordered input-sm w-full"
               />
             </label>
           </div>
 
-          <label className="block space-y-1">
-            <span className="text-xs font-medium text-base-content/75">Catatan</span>
+          <label className="form-control">
+            <span className="label-text mb-1 text-xs font-medium">Catatan</span>
             <input
               type="text"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="Catatan log..."
-              className="h-9 w-full rounded-md border border-base-300 bg-base-100 px-2.5 text-xs text-base-content focus:border-emerald-600 focus:outline-none"
+              placeholder="Catatan..."
+              className="input input-bordered input-sm w-full"
             />
           </label>
 
@@ -309,35 +299,36 @@ export default function LogEntryModal({
                 onChange={(e) => setAllowDuplicateSession(e.target.checked)}
                 className="checkbox checkbox-xs"
               />
-              <span>Izinkan catat ganda pada sesi yang sama</span>
+              <span>Izinkan catat ganda di sesi yang sama</span>
             </label>
           )}
 
           {errorMsg && (
-            <div className="rounded-md border border-rose-300 bg-rose-50 px-3 py-2 text-xs text-rose-700 dark:border-rose-800 dark:bg-rose-950/60 dark:text-rose-300">
-              {errorMsg}
+            <div className="alert alert-error py-2 text-xs">
+              <span>{errorMsg}</span>
             </div>
           )}
 
-          <div className="flex items-center justify-end gap-2 border-t border-base-300 pt-3">
+          <div className="modal-action border-t border-base-300 pt-3">
             <button
               type="button"
               onClick={onClose}
-              className="btn btn-sm btn-ghost border border-base-300 font-medium"
+              className="btn btn-sm btn-ghost border border-base-300 font-normal"
             >
               Batal
             </button>
             <button
               type="submit"
               disabled={saving}
-              className="btn btn-sm btn-primary font-medium gap-1.5 shadow-sm"
+              className="btn btn-sm btn-primary font-medium gap-1.5"
             >
               <CheckCircle2 className="h-3.5 w-3.5" />
-              <span>{saving ? 'Menyimpan...' : mode === 'edit' ? 'Simpan Perubahan' : 'Simpan Log'}</span>
+              <span>{saving ? 'Menyimpan...' : 'Simpan'}</span>
             </button>
           </div>
         </form>
       </div>
+      <div className="modal-backdrop" onClick={onClose} />
     </div>
   );
 }

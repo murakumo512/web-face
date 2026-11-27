@@ -69,7 +69,7 @@ const attendanceLogSchema = new mongoose.Schema(
     },
     workspace: {
       type: String,
-      enum: ['piloting', 'gereja'],
+      enum: ['piloting', 'gereja', 'testing'],
       default: 'piloting',
       index: true,
     },

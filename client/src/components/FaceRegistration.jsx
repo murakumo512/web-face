@@ -517,496 +517,486 @@ export default function FaceRegistration({
   };
 
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+    <div className="grid grid-cols-1 gap-5 lg:grid-cols-12">
       {/* Left: Capture & Recognition Verification */}
       <div className="space-y-4 lg:col-span-7">
-        <div className="rounded-2xl border border-stone-200 bg-white p-4 shadow-sm dark:border-stone-800 dark:bg-[#1C1917] dark:shadow-none">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <h2 className="text-base font-bold text-base-content">
-                Langkah 1 &amp; 2: Ambil &amp; Kenali Wajah Dulu
-              </h2>
-              <p className="text-xs text-base-content/60">
-                Pastikan kotak hijau muncul di wajah Anda, lalu klik Capture &amp; Kenali Wajah.
-              </p>
-            </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <AiEnginePill
-                aiMode={aiMode}
-                onSelectMode={setAiMode}
-                serverHealth={serverHealth}
-                useServerAi={useServerAi}
-                telemetry={telemetry}
-                compact
-              />
-              <button
-                type="button"
-                onClick={() => {
-                  setSourceMode('webcam');
-                  setUploadedPreviewUrl('');
-                }}
-                className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold transition ${
-                  sourceMode === 'webcam'
-                    ? 'bg-sky-600 text-white dark:bg-sky-500'
-                    : 'bg-stone-100 text-stone-700 hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-300 dark:hover:bg-stone-700'
-                }`}
-              >
-                <Camera className="h-3.5 w-3.5" />
-                Kamera
-              </button>
-              <label
-                className={`inline-flex cursor-pointer items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold transition ${
-                  sourceMode === 'upload'
-                    ? 'bg-sky-600 text-white dark:bg-sky-500'
-                    : 'bg-stone-100 text-stone-700 hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-300 dark:hover:bg-stone-700'
-                }`}
-              >
-                <ImagePlus className="h-3.5 w-3.5" />
-                Upload Foto
-                <input type="file" accept="image/*" onChange={handleUploadFile} className="hidden" />
-              </label>
-            </div>
-          </div>
-
-          <div className="relative mt-4 flex aspect-video items-center justify-center overflow-hidden rounded-xl border border-stone-200 bg-stone-100 dark:border-stone-800 dark:bg-stone-950">
-            {sourceMode === 'webcam' ? (
-              <>
-                <video
-                  ref={videoRef}
-                  muted
-                  playsInline
-                  className={`h-full w-full object-contain ${mirrorCamera ? '-scale-x-100' : ''} ${cameraActive ? 'block' : 'hidden'}`}
+        <div className="card border border-base-300 bg-base-100">
+          <div className="card-body gap-3 p-4">
+            <div className="flex flex-wrap items-center justify-between gap-2.5">
+              <div>
+                <h2 className="text-base font-semibold text-base-content">
+                  1. Foto Wajah
+                </h2>
+                <p className="text-xs text-base-content/65">
+                  Arahkan wajah ke kamera atau pilih foto dari galeri.
+                </p>
+              </div>
+              <div className="flex flex-wrap items-center gap-1.5">
+                <AiEnginePill
+                  aiMode={aiMode}
+                  onSelectMode={setAiMode}
+                  serverHealth={serverHealth}
+                  useServerAi={useServerAi}
+                  telemetry={telemetry}
+                  compact
                 />
-                {!cameraActive && (
-                  <div className="p-6 text-center">
-                    <ScanFace className="mx-auto h-10 w-10 text-sky-600 dark:text-sky-400" />
-                    <p className="mt-2 text-sm font-medium text-stone-700 dark:text-stone-200">
-                      Nyalakan kamera untuk mengambil foto wajah
-                    </p>
+                <div className="join">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSourceMode('webcam');
+                      setUploadedPreviewUrl('');
+                    }}
+                    className={`btn btn-sm join-item font-normal gap-1.5 ${
+                      sourceMode === 'webcam' ? 'btn-primary' : 'btn-ghost border border-base-300'
+                    }`}
+                  >
+                    <Camera className="h-3.5 w-3.5" />
+                    Kamera
+                  </button>
+                  <label
+                    className={`btn btn-sm join-item cursor-pointer font-normal gap-1.5 ${
+                      sourceMode === 'upload' ? 'btn-primary' : 'btn-ghost border border-base-300'
+                    }`}
+                  >
+                    <ImagePlus className="h-3.5 w-3.5" />
+                    Unggah
+                    <input type="file" accept="image/*" onChange={handleUploadFile} className="hidden" />
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div className="relative flex aspect-video items-center justify-center overflow-hidden rounded-box border border-base-300 bg-base-200">
+              {sourceMode === 'webcam' ? (
+                <>
+                  <video
+                    ref={videoRef}
+                    muted
+                    playsInline
+                    className={`h-full w-full object-contain ${mirrorCamera ? '-scale-x-100' : ''} ${cameraActive ? 'block' : 'hidden'}`}
+                  />
+                  {!cameraActive && (
+                    <div className="p-6 text-center">
+                      <ScanFace className="mx-auto h-9 w-9 text-primary" />
+                      <p className="mt-2 text-xs sm:text-sm text-base-content/80">
+                        Nyalakan kamera untuk mengambil foto wajah
+                      </p>
+                      <button
+                        type="button"
+                        disabled={!modelsReady}
+                        onClick={startCamera}
+                        className="btn btn-sm btn-primary mt-3 gap-1.5"
+                      >
+                        <Camera className="h-4 w-4" />
+                        {modelsReady ? 'Buka Kamera' : 'Menyiapkan...'}
+                      </button>
+                      {cameraError && (
+                        <p className="mt-2 text-xs text-error">{cameraError}</p>
+                      )}
+                    </div>
+                  )}
+                </>
+              ) : uploadedPreviewUrl ? (
+                <img
+                  ref={uploadImgRef}
+                  src={uploadedPreviewUrl}
+                  alt="Preview Upload"
+                  onLoad={handleAnalyzeUploaded}
+                  className="h-full w-full object-contain"
+                />
+              ) : (
+                <div className="p-6 text-center text-xs text-base-content/60">
+                  Pilih foto wajah yang jelas (1 orang menghadap depan).
+                </div>
+              )}
+              <canvas ref={canvasRef} className="pointer-events-none absolute inset-0 h-full w-full" />
+            </div>
+
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              {sourceMode === 'webcam' && cameraActive ? (
+                <>
+                  <div className="flex flex-wrap items-center gap-1.5">
                     <button
                       type="button"
-                      disabled={!modelsReady}
-                      onClick={startCamera}
-                      className="mt-3 inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white hover:bg-emerald-500 disabled:opacity-50 dark:bg-emerald-500 dark:text-stone-950 dark:hover:bg-emerald-400"
+                      onClick={stopCamera}
+                      className="btn btn-sm btn-ghost border border-base-300 font-normal gap-1.5"
                     >
-                      <Camera className="h-4 w-4" />
-                      {modelsReady ? 'Aktifkan Kamera' : 'Memuat Model...'}
+                      <CameraOff className="h-3.5 w-3.5" />
+                      Tutup
                     </button>
-                    {cameraError && (
-                      <p className="mt-2 text-xs text-rose-600 dark:text-rose-400">{cameraError}</p>
-                    )}
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setMirrorCamera((prev) => {
+                          const next = !prev;
+                          try {
+                            localStorage.setItem('mardonius_camera_mirror', String(next));
+                          } catch {
+                            // ignore
+                          }
+                          return next;
+                        })
+                      }
+                      className={`btn btn-sm font-normal gap-1 ${
+                        mirrorCamera ? 'btn-primary' : 'btn-ghost border border-base-300'
+                      }`}
+                      title="Mirror kamera"
+                    >
+                      <FlipHorizontal2 className="h-3.5 w-3.5" />
+                      {mirrorCamera ? 'Mirror' : 'Normal'}
+                    </button>
+                    <span
+                      className={`badge badge-sm ${
+                        liveFaceCount === 1 ? 'badge-success badge-outline' : 'badge-ghost'
+                      }`}
+                    >
+                      {liveFaceCount === 1
+                        ? '1 wajah pas'
+                        : liveFaceCount > 1
+                          ? `${liveFaceCount} wajah (harus 1)`
+                          : 'Mencari wajah...'}
+                    </span>
                   </div>
-                )}
-              </>
-            ) : uploadedPreviewUrl ? (
-              <img
-                ref={uploadImgRef}
-                src={uploadedPreviewUrl}
-                alt="Preview Upload"
-                onLoad={handleAnalyzeUploaded}
-                className="h-full w-full object-contain"
-              />
-            ) : (
-              <div className="p-6 text-center text-xs text-base-content/60">
-                Pilih foto wajah yang jelas (1 orang menghadap depan).
-              </div>
-            )}
-            <canvas ref={canvasRef} className="pointer-events-none absolute inset-0 h-full w-full" />
-          </div>
 
-          <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-            {sourceMode === 'webcam' && cameraActive ? (
-              <>
-                <div className="flex items-center gap-2">
                   <button
                     type="button"
-                    onClick={stopCamera}
-                    className="inline-flex items-center gap-1.5 rounded-xl bg-stone-100 px-3 py-2 text-xs font-medium text-stone-700 hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-300 dark:hover:bg-stone-700"
+                    disabled={!engineReady || capturing}
+                    onClick={handleCaptureFromWebcam}
+                    className="btn btn-sm btn-primary gap-1.5"
                   >
-                    <CameraOff className="h-3.5 w-3.5" />
-                    Tutup Kamera
+                    {capturing ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Camera className="h-4 w-4" />
+                    )}
+                    {capturing ? 'Memproses...' : 'Ambil Foto'}
                   </button>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setMirrorCamera((prev) => {
-                        const next = !prev;
-                        try {
-                          localStorage.setItem('mardonius_camera_mirror', String(next));
-                        } catch {
-                          // ignore
-                        }
-                        return next;
-                      })
-                    }
-                    className={`btn btn-xs gap-1 ${
-                      mirrorCamera ? 'btn-primary' : 'btn-outline border-base-300'
-                    }`}
-                    title="Flip horizontal kamera"
-                  >
-                    <FlipHorizontal2 className="h-3.5 w-3.5" />
-                    {mirrorCamera ? 'Flip: ON' : 'Normal'}
-                  </button>
-                  <span
-                    className={`rounded-lg px-2.5 py-1 text-[11px] font-semibold ${
-                      liveFaceCount === 1
-                        ? 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:ring-0'
-                        : 'bg-stone-100 text-stone-600 dark:bg-stone-800 dark:text-stone-400'
-                    }`}
-                  >
-                    {liveFaceCount === 1
-                      ? '1 Wajah Terdeteksi'
-                      : liveFaceCount > 1
-                        ? `${liveFaceCount} Wajah (Harus 1)`
-                        : 'Mencari wajah...'}
-                  </span>
-                </div>
-
+                </>
+              ) : sourceMode === 'upload' && uploadedPreviewUrl ? (
                 <button
                   type="button"
                   disabled={!engineReady || capturing}
-                  onClick={handleCaptureFromWebcam}
-                  className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-emerald-500 disabled:opacity-50 dark:bg-emerald-500 dark:text-stone-950 dark:hover:bg-emerald-400"
+                  onClick={handleAnalyzeUploaded}
+                  className="btn btn-sm btn-primary ml-auto gap-1.5"
                 >
                   {capturing ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (
                     <ScanFace className="h-4 w-4" />
                   )}
-                  {capturing ? 'Memproses Capture...' : 'Capture & Kenali Wajah'}
+                  {capturing ? 'Memeriksa...' : 'Periksa Ulang'}
                 </button>
-              </>
-            ) : sourceMode === 'upload' && uploadedPreviewUrl ? (
-              <button
-                type="button"
-                disabled={!engineReady || capturing}
-                onClick={handleAnalyzeUploaded}
-                className="ml-auto inline-flex items-center gap-2 rounded-xl bg-sky-600 px-4 py-2 text-xs font-bold text-white hover:bg-sky-500 disabled:opacity-50 dark:bg-sky-500 dark:hover:bg-sky-400"
-              >
-                {capturing ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <ScanFace className="h-4 w-4" />
-                )}
-                {capturing ? 'Mendeteksi...' : 'Deteksi & Kenali Ulang'}
-              </button>
-            ) : (
-              <span className="text-xs text-stone-500">
-                Tips: Pastikan pencahayaan terang dan wajah menghadap kamera.
-              </span>
-            )}
+              ) : (
+                <span className="text-xs text-base-content/60">
+                  Pastikan cahaya cukup terang dan wajah menghadap ke depan.
+                </span>
+              )}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Right: Verification Result & MongoDB Registration Form */}
+      {/* Right: Verification Result & Registration Form */}
       <div className="space-y-4 lg:col-span-5">
-        <div className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm dark:border-stone-800 dark:bg-[#1C1917] dark:shadow-none">
-          <h2 className="text-base font-bold text-base-content">
-            Langkah 3: Verifikasi &amp; Simpan ke MongoDB
-          </h2>
-          <p className="mt-0.5 text-xs text-base-content/60">
-            Data hanya bisa masuk database setelah wajah terverifikasi sebagai wajah baru.
-          </p>
+        <div className="card border border-base-300 bg-base-100">
+          <div className="card-body gap-3.5 p-4 sm:p-5">
+            <div>
+              <h2 className="text-base font-semibold text-base-content">
+                2. Data Anggota
+              </h2>
+              <p className="mt-0.5 text-xs text-base-content/65">
+                Lengkapi data setelah foto wajah berhasil diperiksa.
+              </p>
+            </div>
 
-          {/* Captured Preview & Verification Badge */}
-          {capturedPhoto || verifyStatus ? (
-            <div className="mt-4 rounded-xl border border-stone-200 bg-stone-50 p-3.5 dark:border-stone-800 dark:bg-stone-950/70">
-              <div className="flex items-center gap-3.5">
-                {capturedPhoto ? (
-                  <img
-                    src={capturedPhoto}
-                    alt="Crop Wajah"
-                    className={`h-16 w-16 rounded-xl object-cover ring-2 ${
-                      verifyStatus === 'new'
-                        ? 'ring-emerald-500'
-                        : verifyStatus === 'duplicate'
-                          ? 'ring-amber-500'
-                          : 'ring-stone-300 dark:ring-stone-700'
-                    }`}
-                  />
-                ) : (
-                  <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-stone-200 text-stone-500 dark:bg-stone-800 dark:text-stone-400">
-                    {verifyStatus === 'checking' ? (
-                      <Loader2 className="h-7 w-7 animate-spin text-sky-600 dark:text-sky-400" />
-                    ) : (
-                      <ScanFace className="h-7 w-7" />
-                    )}
-                  </div>
-                )}
-
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-bold">
-                    <div className="flex items-center gap-1.5">
-                      {verifyStatus === 'new' && (
-                        <>
-                          <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                          <span className="text-emerald-700 dark:text-emerald-400">
-                            Wajah Terverifikasi (Baru)
-                          </span>
-                        </>
-                      )}
-                      {verifyStatus === 'duplicate' && (
-                        <>
-                          <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-                          <span className="text-amber-700 dark:text-amber-400">
-                            Wajah Sudah Terdaftar!
-                          </span>
-                        </>
-                      )}
-                      {verifyStatus === 'checking' && (
-                        <span className="text-sky-600 dark:text-sky-400">Memeriksa database...</span>
-                      )}
-                      {verifyStatus === 'error' && (
-                        <>
-                          <AlertCircle className="h-4 w-4 text-rose-600 dark:text-rose-400" />
-                          <span className="text-rose-700 dark:text-rose-400">Deteksi Gagal</span>
-                        </>
+            {capturedPhoto || verifyStatus ? (
+              <div className="rounded-box border border-base-300 bg-base-200/50 p-3">
+                <div className="flex items-center gap-3">
+                  {capturedPhoto ? (
+                    <img
+                      src={capturedPhoto}
+                      alt="Foto Wajah"
+                      className={`h-14 w-14 rounded-box object-cover border-2 ${
+                        verifyStatus === 'new'
+                          ? 'border-success'
+                          : verifyStatus === 'duplicate'
+                            ? 'border-warning'
+                            : 'border-base-300'
+                      }`}
+                    />
+                  ) : (
+                    <div className="flex h-14 w-14 items-center justify-center rounded-box bg-base-200 text-base-content/50">
+                      {verifyStatus === 'checking' ? (
+                        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                      ) : (
+                        <ScanFace className="h-6 w-6" />
                       )}
                     </div>
+                  )}
 
-                    {dbSyncPercent !== null && (
-                      <span className="rounded-md bg-sky-50 px-2 py-0.5 text-[11px] text-sky-700 ring-1 ring-sky-200 dark:bg-stone-800 dark:text-sky-300 dark:ring-0">
-                        Sync DB: {dbSyncPercent}%
-                      </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-semibold">
+                      <div className="flex items-center gap-1.5">
+                        {verifyStatus === 'new' && (
+                          <>
+                            <CheckCircle2 className="h-4 w-4 text-success" />
+                            <span className="text-success">Wajah siap didaftarkan</span>
+                          </>
+                        )}
+                        {verifyStatus === 'duplicate' && (
+                          <>
+                            <AlertCircle className="h-4 w-4 text-warning" />
+                            <span className="text-warning">Sudah terdaftar</span>
+                          </>
+                        )}
+                        {verifyStatus === 'checking' && (
+                          <span className="text-primary">Memeriksa data...</span>
+                        )}
+                        {verifyStatus === 'error' && (
+                          <>
+                            <AlertCircle className="h-4 w-4 text-error" />
+                            <span className="text-error">Gagal mendeteksi</span>
+                          </>
+                        )}
+                      </div>
+
+                      {dbSyncPercent !== null && (
+                        <span className="badge badge-ghost badge-xs">
+                          Kecocokan: {dbSyncPercent}%
+                        </span>
+                      )}
+                    </div>
+                    <p className="mt-1 text-xs leading-relaxed text-base-content/75">
+                      {verifyMessage}
+                    </p>
+                    {matchedExistingUser && (
+                      <p className="mt-1 text-[11px] text-warning">
+                        Terdaftar atas nama: <strong>{matchedExistingUser.name}</strong> ({matchedExistingUser.department})
+                      </p>
                     )}
                   </div>
-                  <p className="mt-1 text-xs leading-relaxed text-base-content/75">
-                    {verifyMessage}
-                  </p>
-                  {matchedExistingUser && (
-                    <p className="mt-1 text-[11px] text-amber-700 dark:text-amber-300">
-                      Nama di DB: <strong>{matchedExistingUser.name}</strong> ({matchedExistingUser.department})
-                    </p>
-                  )}
                 </div>
-              </div>
-              <button
-                type="button"
-                onClick={resetCapture}
-                className="mt-2.5 text-[11px] font-medium text-stone-500 underline hover:text-stone-900 dark:text-stone-400 dark:hover:text-white"
-              >
-                Ambil ulang wajah lain
-              </button>
-            </div>
-          ) : (
-            <div className="mt-4 rounded-xl border border-dashed border-stone-300 bg-stone-50 p-4 text-center text-xs text-stone-500 dark:border-stone-700 dark:bg-[#141210]/50 dark:text-stone-400">
-              Belum ada wajah yang diambil. Aktifkan kamera lalu klik <strong>Capture &amp; Kenali Wajah</strong>.
-            </div>
-          )}
-
-          {/* Success banner after saving */}
-          {savedUser && (
-            <div className="mt-4 rounded-xl border border-emerald-300 bg-emerald-50 p-4 dark:border-emerald-500/40 dark:bg-emerald-950/40">
-              <div className="flex items-center gap-2 text-sm font-bold text-emerald-700 dark:text-emerald-300">
-                <Sparkles className="h-4 w-4" />
-                Berhasil Masuk MongoDB!
-              </div>
-              <p className="mt-1 text-xs text-emerald-800 dark:text-emerald-100/80">
-                Wajah <strong>{savedUser.name}</strong> sudah tersimpan. Sekarang coba uji di menu Kamera Full-Screen.
-              </p>
-              <button
-                type="button"
-                onClick={() => onGoToLive?.()}
-                className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-emerald-500 dark:bg-emerald-500 dark:text-stone-950 dark:hover:bg-emerald-400"
-              >
-                Lanjut Test Recognisi →
-              </button>
-            </div>
-          )}
-
-          {/* Registration Form */}
-          <form onSubmit={handleSaveToMongo} className="mt-4 space-y-3.5">
-            <div>
-              <label className="mb-1 block text-xs font-medium text-base-content/80">
-                Nama Lengkap <span className="text-rose-500 dark:text-rose-400">*</span>
-              </label>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Contoh: Budi Santoso"
-                className="w-full rounded-xl border border-stone-300 bg-stone-50 px-3.5 py-2 text-sm text-stone-900 placeholder-stone-400 focus:border-[#7C2D12] focus:outline-none dark:border-stone-700 dark:bg-stone-950 dark:text-white dark:placeholder-stone-500"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="mb-1 block text-xs font-medium text-base-content/80">
-                  {workspace === 'gereja' ? 'No. Induk Jemaat' : 'ID / NIM / NIP'}
-                </label>
-                <input
-                  type="text"
-                  value={identifier}
-                  onChange={(e) => setIdentifier(e.target.value)}
-                  placeholder={wsMeta.identifierPlaceholder}
-                  className="w-full rounded-xl border border-base-300 bg-base-200 px-3.5 py-2 text-sm text-stone-900 placeholder-stone-400 focus:border-[#7C2D12] focus:outline-none dark:border-stone-700 dark:bg-stone-950 dark:text-white dark:placeholder-stone-500"
-                />
-              </div>
-
-              <div>
-                <label className="mb-1 block text-xs font-medium text-base-content/80">
-                  {workspace === 'gereja' ? 'Komisi / Ibadah' : 'Divisi / Kelas'}
-                </label>
-                <input
-                  type="text"
-                  value={department}
-                  onChange={(e) => setDepartment(e.target.value)}
-                  placeholder={wsMeta.departmentPlaceholder}
-                  className="w-full rounded-xl border border-base-300 bg-base-200 px-3.5 py-2 text-sm text-stone-900 placeholder-stone-400 focus:border-[#7C2D12] focus:outline-none dark:border-stone-700 dark:bg-stone-950 dark:text-white dark:placeholder-stone-500"
-                />
-              </div>
-            </div>
-
-            {/* Wilayah selector (especially useful for Wilayah Jemaat 1..10) */}
-            <div>
-              <label className="mb-1 block text-xs font-medium text-base-content/80">
-                Wilayah {workspace === 'gereja' ? 'Jemaat' : '(Opsional)'}
-              </label>
-              <div className="space-y-2">
-                <select
-                  value={customWilayahMode ? '__custom__' : wilayah}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    if (val === '__custom__') {
-                      setCustomWilayahMode(true);
-                      setWilayah('');
-                    } else {
-                      setCustomWilayahMode(false);
-                      setWilayah(val);
-                    }
-                  }}
-                  className="select select-bordered w-full bg-base-200 text-sm text-base-content"
+                <button
+                  type="button"
+                  onClick={resetCapture}
+                  className="btn btn-link btn-xs px-0 mt-1 text-base-content/70"
                 >
-                  <option value="">-- Pilih Wilayah (Opsional) --</option>
-                  {Array.from({ length: 10 }, (_, i) => `Wilayah ${i + 1}`).map((w) => (
-                    <option key={w} value={w}>
-                      {w}
-                    </option>
-                  ))}
-                  <option value="__custom__">Ketik Wilayah Lainnya...</option>
-                </select>
-                {customWilayahMode && (
-                  <input
-                    type="text"
-                    value={wilayah}
-                    onChange={(e) => setWilayah(e.target.value)}
-                    placeholder="Contoh: Wilayah Tengah / Wilayah 12"
-                    className="input input-bordered input-sm w-full bg-base-200 text-sm text-base-content"
-                  />
-                )}
+                  Ambil foto ulang
+                </button>
               </div>
-            </div>
-
-            <div>
-              <div className="mb-1 flex items-center justify-between gap-2">
-                <label className="block text-xs font-medium text-base-content/80">
-                  Peran / Status
-                </label>
-                {canManageRoles && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setManageRolesOpen((v) => !v);
-                      setRoleFeedback('');
-                    }}
-                    className="btn btn-ghost btn-xs gap-1 text-primary"
-                  >
-                    <Settings2 className="h-3 w-3" />
-                    <span>{manageRolesOpen ? 'Tutup Kelola' : '+ Tambah / Hapus Peran'}</span>
-                  </button>
-                )}
-              </div>
-
-              <select
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                className="select select-bordered w-full bg-base-200 text-sm text-base-content"
-              >
-                {roleOptions.map((opt) => (
-                  <option key={opt} value={opt}>
-                    {opt}
-                  </option>
-                ))}
-              </select>
-
-              {manageRolesOpen && (
-                <div className="mt-2.5 space-y-2.5 rounded-xl border border-base-300 bg-base-200 p-3">
-                  <div className="text-[11px] font-bold uppercase tracking-wider text-base-content/60">
-                    Kelola Daftar Peran ({wsMeta.shortLabel})
-                  </div>
-
-                  <div className="flex flex-wrap gap-1.5">
-                    {roleOptions.map((opt) => (
-                      <span
-                        key={opt}
-                        className="badge badge-outline border-base-300 bg-base-100 gap-1.5 py-2.5 text-xs"
-                      >
-                        <span>{opt}</span>
-                        {roleOptions.length > 1 && (
-                          <button
-                            type="button"
-                            onClick={() => handleDeleteRoleOption(opt)}
-                            className="text-error hover:opacity-75"
-                            title={`Hapus peran "${opt}"`}
-                          >
-                            <X className="h-3 w-3" />
-                          </button>
-                        )}
-                      </span>
-                    ))}
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="text"
-                      value={newRoleInput}
-                      onChange={(e) => setNewRoleInput(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault();
-                          handleAddRoleOption();
-                        }
-                      }}
-                      placeholder={
-                        workspace === 'gereja'
-                          ? 'Peran baru (mis: Diaken, Usher, Koster)'
-                          : 'Peran baru (mis: Dosen, Magang)'
-                      }
-                      className="input input-bordered input-xs flex-1"
-                    />
-                    <button
-                      type="button"
-                      onClick={handleAddRoleOption}
-                      className="btn btn-primary btn-xs gap-1"
-                    >
-                      <Plus className="h-3 w-3" />
-                      Tambah
-                    </button>
-                  </div>
-
-                  {roleFeedback && (
-                    <div className="text-[11px] font-medium text-error">{roleFeedback}</div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {formError && (
-              <div className="rounded-xl border border-rose-300 bg-rose-50 px-3 py-2 text-xs text-rose-700 dark:border-rose-500/40 dark:bg-rose-950/50 dark:text-rose-300">
-                {formError}
+            ) : (
+              <div className="rounded-box border border-dashed border-base-300 bg-base-200/40 p-4 text-center text-xs text-base-content/60">
+                Belum ada foto. Buka kamera lalu tekan <strong>Ambil Foto</strong>.
               </div>
             )}
 
-            <button
-              type="submit"
-              disabled={saving || verifyStatus !== 'new'}
-              className={`inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold shadow-sm transition disabled:cursor-not-allowed disabled:opacity-40 ${wsMeta.accentSolidClass}`}
-            >
-              <Database className="h-4 w-4" />
-              {saving ? 'Menyimpan ke MongoDB...' : `Simpan ke ${wsMeta.shortLabel}`}
-            </button>
-          </form>
+            {savedUser && (
+              <div className="alert alert-success py-3 text-xs">
+                <CheckCircle2 className="h-4 w-4 shrink-0" />
+                <div className="flex-1">
+                  <div className="font-semibold">Data Tersimpan</div>
+                  <div>Wajah <strong>{savedUser.name}</strong> berhasil didaftarkan.</div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => onGoToLive?.()}
+                  className="btn btn-xs btn-neutral"
+                >
+                  Buka Kamera
+                </button>
+              </div>
+            )}
+
+            <form onSubmit={handleSaveToMongo} className="space-y-3">
+              <label className="form-control">
+                <span className="label-text mb-1 text-xs font-medium">
+                  Nama Lengkap <span className="text-error">*</span>
+                </span>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Contoh: Budi Santoso"
+                  className="input input-bordered input-sm w-full"
+                />
+              </label>
+
+              <div className="grid grid-cols-2 gap-3">
+                <label className="form-control">
+                  <span className="label-text mb-1 text-xs font-medium">
+                    {workspace === 'gereja' ? 'No. Induk Jemaat' : 'Nomor Induk'}
+                  </span>
+                  <input
+                    type="text"
+                    value={identifier}
+                    onChange={(e) => setIdentifier(e.target.value)}
+                    placeholder={wsMeta.identifierPlaceholder}
+                    className="input input-bordered input-sm w-full"
+                  />
+                </label>
+
+                <label className="form-control">
+                  <span className="label-text mb-1 text-xs font-medium">
+                    {workspace === 'gereja' ? 'Komisi / Ibadah' : 'Bagian / Kelas'}
+                  </span>
+                  <input
+                    type="text"
+                    value={department}
+                    onChange={(e) => setDepartment(e.target.value)}
+                    placeholder={wsMeta.departmentPlaceholder}
+                    className="input input-bordered input-sm w-full"
+                  />
+                </label>
+              </div>
+
+              <div className="form-control">
+                <span className="label-text mb-1 text-xs font-medium">
+                  Wilayah {workspace === 'gereja' ? 'Jemaat' : '(Opsional)'}
+                </span>
+                <div className="space-y-2">
+                  <select
+                    value={customWilayahMode ? '__custom__' : wilayah}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val === '__custom__') {
+                        setCustomWilayahMode(true);
+                        setWilayah('');
+                      } else {
+                        setCustomWilayahMode(false);
+                        setWilayah(val);
+                      }
+                    }}
+                    className="select select-bordered select-sm w-full"
+                  >
+                    <option value="">-- Pilih Wilayah (Opsional) --</option>
+                    {Array.from({ length: 10 }, (_, i) => `Wilayah ${i + 1}`).map((w) => (
+                      <option key={w} value={w}>
+                        {w}
+                      </option>
+                    ))}
+                    <option value="__custom__">Ketik Wilayah Lainnya...</option>
+                  </select>
+                  {customWilayahMode && (
+                    <input
+                      type="text"
+                      value={wilayah}
+                      onChange={(e) => setWilayah(e.target.value)}
+                      placeholder="Contoh: Wilayah Tengah"
+                      className="input input-bordered input-sm w-full"
+                    />
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <div className="mb-1 flex items-center justify-between gap-2">
+                  <span className="text-xs font-medium text-base-content/80">Peran</span>
+                  {canManageRoles && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setManageRolesOpen((v) => !v);
+                        setRoleFeedback('');
+                      }}
+                      className="btn btn-ghost btn-xs gap-1 text-primary font-normal"
+                    >
+                      <Settings2 className="h-3 w-3" />
+                      <span>{manageRolesOpen ? 'Tutup' : 'Kelola Peran'}</span>
+                    </button>
+                  )}
+                </div>
+
+                <select
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                  className="select select-bordered select-sm w-full"
+                >
+                  {roleOptions.map((opt) => (
+                    <option key={opt} value={opt}>
+                      {opt}
+                    </option>
+                  ))}
+                </select>
+
+                {manageRolesOpen && (
+                  <div className="mt-2 space-y-2 rounded-box border border-base-300 bg-base-200/60 p-3">
+                    <div className="text-xs font-medium text-base-content/75">
+                      Daftar Peran ({wsMeta.shortLabel})
+                    </div>
+
+                    <div className="flex flex-wrap gap-1.5">
+                      {roleOptions.map((opt) => (
+                        <span
+                          key={opt}
+                          className="badge badge-outline border-base-300 bg-base-100 gap-1.5 py-2.5 text-xs"
+                        >
+                          <span>{opt}</span>
+                          {roleOptions.length > 1 && (
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteRoleOption(opt)}
+                              className="text-error hover:opacity-75"
+                              title={`Hapus peran "${opt}"`}
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          )}
+                        </span>
+                      ))}
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        value={newRoleInput}
+                        onChange={(e) => setNewRoleInput(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            handleAddRoleOption();
+                          }
+                        }}
+                        placeholder={
+                          workspace === 'gereja'
+                            ? 'Peran baru (mis: Diaken, Usher)'
+                            : 'Peran baru (mis: Dosen, Magang)'
+                        }
+                        className="input input-bordered input-xs flex-1"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleAddRoleOption}
+                        className="btn btn-primary btn-xs gap-1"
+                      >
+                        <Plus className="h-3 w-3" />
+                        Tambah
+                      </button>
+                    </div>
+
+                    {roleFeedback && (
+                      <div className="text-[11px] font-medium text-error">{roleFeedback}</div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {formError && (
+                <div className="alert alert-error py-2 text-xs">
+                  <span>{formError}</span>
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={saving || verifyStatus !== 'new'}
+                className="btn btn-primary w-full h-10 sm:h-9 gap-2"
+              >
+                <Database className="h-4 w-4" />
+                {saving ? 'Menyimpan...' : 'Simpan Data'}
+              </button>
+            </form>
+          </div>
         </div>
       </div>
     </div>

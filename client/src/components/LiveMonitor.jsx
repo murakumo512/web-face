@@ -682,21 +682,21 @@ export default function LiveMonitor({
   const minMatchPct = Math.round((1 - thresholdRef.current) * 100);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {toast && (
         <div
-          className={`fixed bottom-5 right-5 z-50 flex items-center gap-3 rounded-xl border px-4 py-3 text-sm font-medium shadow-2xl backdrop-blur ${
+          className={`alert fixed bottom-16 md:bottom-5 right-4 z-50 w-auto max-w-sm py-2.5 text-xs shadow-md ${
             toast.type === 'success'
-              ? 'border-emerald-300 bg-emerald-50/95 text-emerald-800 dark:border-emerald-500/40 dark:bg-emerald-950/90 dark:text-emerald-200'
+              ? 'alert-success'
               : toast.type === 'warning'
-                ? 'border-amber-300 bg-amber-50/95 text-amber-800 dark:border-amber-500/40 dark:bg-amber-950/90 dark:text-amber-200'
-                : 'border-rose-300 bg-rose-50/95 text-rose-800 dark:border-rose-500/40 dark:bg-rose-950/90 dark:text-rose-200'
+                ? 'alert-warning'
+                : 'alert-error'
           }`}
         >
           {toast.type === 'success' ? (
-            <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+            <CheckCircle2 className="h-4 w-4 shrink-0" />
           ) : (
-            <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+            <AlertTriangle className="h-4 w-4 shrink-0" />
           )}
           <span>{toast.text}</span>
         </div>
@@ -704,61 +704,69 @@ export default function LiveMonitor({
 
       {/* Top KPI Cards */}
       <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-        <div className="rounded-2xl border border-stone-200 bg-white p-3.5 shadow-sm dark:border-stone-800 dark:bg-[#1C1917] dark:shadow-none sm:p-4">
-          <div className="flex items-center justify-between text-base-content/60">
-            <span className="text-[11px] font-semibold uppercase tracking-wider sm:text-xs">Total Masuk</span>
-            <Users className="h-4 w-4 text-sky-600 dark:text-sky-400" />
+        <div className="card border border-base-300 bg-base-100">
+          <div className="card-body p-3.5 sm:p-4 gap-1">
+            <div className="flex items-center justify-between text-base-content/60">
+              <span className="text-xs font-medium">Total Masuk</span>
+              <Users className="h-4 w-4 text-primary" />
+            </div>
+            <p className="text-2xl font-semibold text-base-content sm:text-3xl">
+              {summary.totalCount}
+            </p>
+            <p className="text-[11px] text-base-content/60">
+              Anggota + Tamu
+            </p>
           </div>
-          <p className="mt-1.5 text-2xl font-bold text-base-content sm:mt-2 sm:text-3xl">
-            {summary.totalCount}
-          </p>
-          <p className="mt-1 text-[11px] text-base-content/60 sm:text-xs">
-            Terdaftar + Tidak Terdaftar
-          </p>
         </div>
 
-        <div className="rounded-2xl border border-emerald-200 bg-emerald-50/70 p-3.5 shadow-sm dark:border-emerald-500/20 dark:bg-emerald-950/20 dark:shadow-none sm:p-4">
-          <div className="flex items-center justify-between text-emerald-700 dark:text-emerald-300">
-            <span className="text-[11px] font-semibold uppercase tracking-wider sm:text-xs">Terdaftar</span>
-            <UserCheck className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+        <div className="card border border-base-300 bg-base-100">
+          <div className="card-body p-3.5 sm:p-4 gap-1">
+            <div className="flex items-center justify-between text-base-content/60">
+              <span className="text-xs font-medium">Terdaftar</span>
+              <UserCheck className="h-4 w-4 text-success" />
+            </div>
+            <p className="text-2xl font-semibold text-success sm:text-3xl">
+              {summary.registeredCount}
+            </p>
+            <p className="text-[11px] text-base-content/60">
+              {summary.uniqueRegisteredCount} orang hadir
+            </p>
           </div>
-          <p className="mt-1.5 text-2xl font-bold text-emerald-600 dark:text-emerald-400 sm:mt-2 sm:text-3xl">
-            {summary.registeredCount}
-          </p>
-          <p className="mt-1 text-[11px] text-emerald-700/80 dark:text-emerald-300/70 sm:text-xs">
-            {summary.uniqueRegisteredCount} orang unik hadir
-          </p>
         </div>
 
-        <div className="rounded-2xl border border-amber-200 bg-amber-50/70 p-3.5 shadow-sm dark:border-amber-500/20 dark:bg-amber-950/20 dark:shadow-none sm:p-4">
-          <div className="flex items-center justify-between text-amber-700 dark:text-amber-300">
-            <span className="text-[11px] font-semibold uppercase tracking-wider sm:text-xs">Bablas</span>
-            <UserX className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+        <div className="card border border-base-300 bg-base-100">
+          <div className="card-body p-3.5 sm:p-4 gap-1">
+            <div className="flex items-center justify-between text-base-content/60">
+              <span className="text-xs font-medium">Tamu</span>
+              <UserX className="h-4 w-4 text-warning" />
+            </div>
+            <p className="text-2xl font-semibold text-warning sm:text-3xl">
+              {summary.unregisteredCount}
+            </p>
+            <p className="text-[11px] text-base-content/60">
+              Belum terdaftar
+            </p>
           </div>
-          <p className="mt-1.5 text-2xl font-bold text-amber-600 dark:text-amber-400 sm:mt-2 sm:text-3xl">
-            {summary.unregisteredCount}
-          </p>
-          <p className="mt-1 text-[11px] text-amber-700/80 dark:text-amber-300/70 sm:text-xs">
-            Lewat tanpa registrasi
-          </p>
         </div>
 
-        <div className="rounded-2xl border border-stone-200 bg-white p-3.5 shadow-sm dark:border-stone-800 dark:bg-[#1C1917] dark:shadow-none sm:p-4">
-          <div className="flex items-center justify-between text-base-content/60">
-            <span className="text-[11px] font-semibold uppercase tracking-wider sm:text-xs">Sync DB</span>
-            <Database className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
+        <div className="card border border-base-300 bg-base-100">
+          <div className="card-body p-3.5 sm:p-4 gap-1">
+            <div className="flex items-center justify-between text-base-content/60">
+              <span className="text-xs font-medium">Data Wajah</span>
+              <Database className="h-4 w-4 text-info" />
+            </div>
+            <p className="text-2xl font-semibold text-base-content sm:text-3xl">
+              {registeredUsersCount}
+            </p>
+            <p className="text-[11px] text-base-content/60">
+              Minimal cocok {minMatchPct}%
+            </p>
           </div>
-          <p className="mt-1.5 text-2xl font-bold text-base-content sm:mt-2 sm:text-3xl">
-            {registeredUsersCount}
-          </p>
-          <p className="mt-1 text-[11px] text-base-content/60 sm:text-xs">
-            User aktif (min {minMatchPct}%)
-          </p>
         </div>
       </div>
 
       {/* Main Grid: Camera + Controls (Left 8 cols) | Live Feed & Alerts (Right 4 cols) */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-12">
         <div className="space-y-3 lg:col-span-8">
           <SessionScheduleBar
             sessionDate={sessionDate}
@@ -769,33 +777,29 @@ export default function LiveMonitor({
           />
 
           {/* Control Bar */}
-          <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-base-300 bg-base-100 p-3 shadow-sm">
-            <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center justify-between gap-2.5 rounded-box border border-base-300 bg-base-100 p-3">
+            <div className="join">
               <button
                 type="button"
                 onClick={() => {
                   setInputMode('webcam');
                   setUploadedImgUrl('');
                 }}
-                className={`inline-flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-semibold transition sm:text-sm ${
-                  inputMode === 'webcam'
-                    ? 'bg-sky-600 text-white shadow-sm dark:bg-sky-500 dark:shadow-sky-500/20'
-                    : 'bg-stone-100 text-stone-700 hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-300 dark:hover:bg-stone-700'
+                className={`btn btn-sm join-item font-normal gap-1.5 ${
+                  inputMode === 'webcam' ? 'btn-primary' : 'btn-ghost border border-base-300'
                 }`}
               >
-                <Camera className="h-4 w-4" />
-                Kamera Live
+                <Camera className="h-3.5 w-3.5" />
+                Kamera
               </button>
 
               <label
-                className={`inline-flex cursor-pointer items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-semibold transition sm:text-sm ${
-                  inputMode === 'photo'
-                    ? 'bg-sky-600 text-white shadow-sm dark:bg-sky-500 dark:shadow-sky-500/20'
-                    : 'bg-stone-100 text-stone-700 hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-300 dark:hover:bg-stone-700'
+                className={`btn btn-sm join-item cursor-pointer font-normal gap-1.5 ${
+                  inputMode === 'photo' ? 'btn-primary' : 'btn-ghost border border-base-300'
                 }`}
               >
-                <ImagePlus className="h-4 w-4" />
-                Test via Foto
+                <ImagePlus className="h-3.5 w-3.5" />
+                Foto
                 <input
                   type="file"
                   accept="image/*"
@@ -821,17 +825,17 @@ export default function LiveMonitor({
                       type="button"
                       disabled={!engineReady || !hasValidSchedule}
                       onClick={startCamera}
-                      className="inline-flex h-9 items-center gap-2 rounded-md bg-emerald-600 px-3.5 text-xs font-medium text-white transition hover:bg-emerald-700 disabled:opacity-50"
+                      className="btn btn-sm btn-primary gap-1.5"
                     >
                       <Camera className="h-3.5 w-3.5" />
                       {!hasValidSchedule
-                        ? 'Isi Tgl & Jam Dulu'
+                        ? 'Isi Tanggal & Jam'
                         : engineReady
-                          ? 'Mulai Kamera'
-                          : 'Menyiapkan Model AI...'}
+                          ? 'Buka Kamera'
+                          : 'Menyiapkan...'}
                     </button>
                   ) : (
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5">
                       <button
                         type="button"
                         onClick={() =>
@@ -845,21 +849,21 @@ export default function LiveMonitor({
                             return next;
                           })
                         }
-                        className={`btn btn-sm gap-1 ${
-                          mirrorCamera ? 'btn-primary' : 'btn-outline border-base-300'
+                        className={`btn btn-sm font-normal gap-1 ${
+                          mirrorCamera ? 'btn-primary' : 'btn-ghost border border-base-300'
                         }`}
-                        title="Flip horizontal kamera"
+                        title="Mirror kamera"
                       >
-                        <FlipHorizontal2 className="h-4 w-4" />
-                        <span>{mirrorCamera ? 'Flip: ON' : 'Normal'}</span>
+                        <FlipHorizontal2 className="h-3.5 w-3.5" />
+                        <span>{mirrorCamera ? 'Mirror' : 'Normal'}</span>
                       </button>
                       <button
                         type="button"
                         onClick={stopCamera}
-                        className="inline-flex items-center gap-2 rounded-xl bg-rose-50 px-4 py-2 text-xs font-semibold text-rose-700 ring-1 ring-rose-300 transition hover:bg-rose-100 dark:bg-rose-500/20 dark:text-rose-300 dark:ring-rose-500/40 dark:hover:bg-rose-500/30 sm:text-sm"
+                        className="btn btn-sm btn-error gap-1.5"
                       >
-                        <CameraOff className="h-4 w-4" />
-                        Matikan Kamera
+                        <CameraOff className="h-3.5 w-3.5" />
+                        Stop
                       </button>
                     </div>
                   )}
@@ -871,18 +875,18 @@ export default function LiveMonitor({
                   type="button"
                   disabled={!engineReady || !hasValidSchedule || analyzingPhoto}
                   onClick={analyzeUploadedPhoto}
-                  className="inline-flex h-9 items-center gap-2 rounded-md bg-emerald-600 px-3.5 text-xs font-medium text-white transition hover:bg-emerald-700 disabled:opacity-50"
+                  className="btn btn-sm btn-primary gap-1.5"
                 >
-                  <UserCheck className="h-4 w-4" />
-                  {analyzingPhoto ? 'Mendeteksi...' : 'Scan & Recognisi Foto'}
+                  <UserCheck className="h-3.5 w-3.5" />
+                  {analyzingPhoto ? 'Memeriksa...' : 'Periksa Foto'}
                 </button>
               )}
             </div>
           </div>
 
           {/* Video / Image Stage */}
-          <div className="relative overflow-hidden rounded-2xl border border-stone-200 bg-stone-100 shadow-sm dark:border-stone-800 dark:bg-stone-950 dark:shadow-xl">
-            <div className="relative flex aspect-video w-full items-center justify-center bg-stone-100 dark:bg-stone-900/50">
+          <div className="relative overflow-hidden rounded-box border border-base-300 bg-base-100">
+            <div className="relative flex aspect-video w-full items-center justify-center bg-base-200">
               {inputMode === 'webcam' ? (
                 <>
                   <video
@@ -893,20 +897,19 @@ export default function LiveMonitor({
                   />
                   {!cameraActive && (
                     <div className="flex flex-col items-center justify-center p-6 text-center sm:p-8">
-                      <div className="mb-3 rounded-2xl bg-white p-4 text-sky-600 shadow-sm ring-1 ring-stone-200 dark:bg-stone-800/80 dark:text-sky-400 dark:ring-0">
-                        <Camera className="h-9 w-9 sm:h-10 sm:w-10" />
+                      <div className="mb-3 rounded-box border border-base-300 bg-base-100 p-3.5 text-primary">
+                        <Camera className="h-8 w-8" />
                       </div>
-                      <h3 className="text-sm font-semibold text-stone-900 dark:text-stone-100 sm:text-base">
-                        Kamera Presensi &amp; Counting Belum Aktif
+                      <h3 className="text-sm font-semibold text-base-content sm:text-base">
+                        Kamera Belum Aktif
                       </h3>
-                      <p className="mt-1 max-w-md text-xs text-base-content/60 sm:text-sm">
-                        Klik <span className="font-semibold text-emerald-600 dark:text-emerald-400">Mulai Kamera</span> untuk deteksi wajah real-time, atau pilih{' '}
-                        <span className="font-semibold text-sky-600 dark:text-sky-400">Test via Foto</span> untuk menguji dengan gambar.
+                      <p className="mt-1 max-w-md text-xs text-base-content/65">
+                        Tekan Buka Kamera untuk mulai deteksi wajah, atau pilih tab Foto untuk menguji gambar.
                       </p>
                       {cameraError && (
-                        <p className="mt-3 rounded-lg border border-rose-300 bg-rose-50 px-3 py-2 text-xs text-rose-700 dark:border-rose-500/30 dark:bg-rose-950/50 dark:text-rose-300">
-                          {cameraError}
-                        </p>
+                        <div className="alert alert-error mt-3 py-2 text-xs">
+                          <span>{cameraError}</span>
+                        </div>
                       )}
                     </div>
                   )}
@@ -922,7 +925,7 @@ export default function LiveMonitor({
                       className="h-full w-full object-contain"
                     />
                   ) : (
-                    <div className="p-8 text-center text-sm text-base-content/60">
+                    <div className="p-8 text-center text-xs sm:text-sm text-base-content/60">
                       Pilih file gambar untuk menguji pengenalan wajah.
                     </div>
                   )}
@@ -936,284 +939,275 @@ export default function LiveMonitor({
             </div>
 
             {/* Live Bottom Detection Strip */}
-            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-stone-200 bg-white px-4 py-2.5 text-xs dark:border-stone-800 dark:bg-stone-900/90">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-t border-base-300 bg-base-100 px-3.5 py-2.5 text-xs">
               <div className="flex items-center gap-2">
                 <span
-                  className={`h-2.5 w-2.5 rounded-full ${
-                    cameraActive ? 'animate-pulse bg-emerald-500 dark:bg-emerald-400' : 'bg-stone-400 dark:bg-stone-600'
+                  className={`h-2 w-2 rounded-full ${
+                    cameraActive ? 'bg-success' : 'bg-base-content/30'
                   }`}
                 />
                 <span className="text-base-content/80">
                   {activeFaces.length === 0
-                    ? 'Menunggu wajah masuk area kamera...'
-                    : `Terdeteksi ${activeFaces.length} wajah: ${activeFaces
+                    ? 'Menunggu wajah...'
+                    : `${activeFaces.length} wajah: ${activeFaces
                         .map((f) =>
                           f.matched
-                            ? `${f.user.name} (Sync DB: ${f.confidence}%)`
-                            : `Belum Terdaftar (Sync DB: ${f.confidence}%)`
+                            ? `${f.user.name} (${f.confidence}%)`
+                            : `Tamu (${f.confidence}%)`
                         )
                         .join(', ')}`}
                 </span>
               </div>
               <span className="text-base-content/60">
-                Minimal cocok DB: <strong className="text-sky-600 dark:text-sky-300">{minMatchPct}%</strong>
+                Batas cocok: <strong>{minMatchPct}%</strong>
               </span>
             </div>
           </div>
 
-          {/* Real-time DB Sync Progress Per Face */}
+          {/* Recognition Progress Per Face */}
           {activeFaces.length > 0 && (
-            <div className="rounded-2xl border border-stone-200 bg-white p-4 shadow-sm dark:border-stone-800 dark:bg-[#1C1917] dark:shadow-none">
-              <div className="mb-2.5 flex items-center justify-between">
-                <h4 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-base-content/80">
-                  <Database className="h-3.5 w-3.5 text-sky-600 dark:text-sky-400" />
-                  Live Sync Kecocokan Wajah ke MongoDB
-                </h4>
-                <span className="text-[11px] text-base-content/60">
-                  {registeredUsersCount} wajah di DB
-                </span>
-              </div>
-              <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
-                {activeFaces.map((face, i) => (
-                  <div
-                    key={face.trackId || i}
-                    className={`rounded-xl border p-3 ${
-                      face.matched
-                        ? 'border-emerald-200 bg-emerald-50 dark:border-emerald-500/30 dark:bg-emerald-950/25'
-                        : 'border-amber-200 bg-amber-50 dark:border-amber-500/30 dark:bg-amber-950/20'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between text-xs font-semibold">
-                      <span className={face.matched ? 'text-emerald-700 dark:text-emerald-300' : 'text-amber-700 dark:text-amber-300'}>
-                        {face.matched ? face.user.name : `Orang #${face.trackId || i + 1} (Belum Regis)`}
-                      </span>
-                      <span className="text-base-content">Sync: {face.confidence}%</span>
-                    </div>
-                    <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-stone-200 dark:bg-stone-800">
-                      <div
-                        style={{ width: `${face.confidence}%` }}
-                        className={`h-full rounded-full transition-all ${
-                          face.matched ? 'bg-emerald-500' : 'bg-amber-500'
-                        }`}
+            <div className="card border border-base-300 bg-base-100">
+              <div className="card-body gap-2.5 p-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="flex items-center gap-2 text-xs font-semibold text-base-content">
+                    <Database className="h-3.5 w-3.5 text-primary" />
+                    Hasil Deteksi Wajah
+                  </h4>
+                  <span className="text-[11px] text-base-content/60">
+                    {registeredUsersCount} wajah terdaftar
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+                  {activeFaces.map((face, i) => (
+                    <div
+                      key={face.trackId || i}
+                      className="rounded-box border border-base-300 bg-base-200/50 p-3"
+                    >
+                      <div className="flex items-center justify-between text-xs font-semibold">
+                        <span className={face.matched ? 'text-success' : 'text-warning'}>
+                          {face.matched ? face.user.name : `Orang #${face.trackId || i + 1}`}
+                        </span>
+                        <span className="text-base-content">{face.confidence}%</span>
+                      </div>
+                      <progress
+                        className={`progress mt-2 w-full ${face.matched ? 'progress-success' : 'progress-warning'}`}
+                        value={face.confidence}
+                        max="100"
                       />
+                      <div className="mt-1 text-[11px] text-base-content/65">
+                        {face.matched
+                          ? `Cocok (≥ ${minMatchPct}%)`
+                          : face.closestUser
+                            ? `Mirip ${face.closestUser.name} (${face.confidence}%)`
+                            : 'Belum terdaftar'}
+                      </div>
                     </div>
-                    <div className="mt-1.5 text-[11px] text-stone-600 dark:text-stone-400">
-                      {face.matched
-                        ? `Cocok dengan data MongoDB (≥ ${minMatchPct}%)`
-                        : face.closestUser
-                          ? `Terdekat di DB: ${face.closestUser.name} (${face.confidence}% < ${minMatchPct}%)`
-                          : 'Belum ada wajah terdaftar di MongoDB'}
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
           )}
 
-          {/* Recognition & Counting Settings */}
-          <div className="grid grid-cols-1 gap-3 rounded-2xl border border-stone-200 bg-white p-4 shadow-sm dark:border-stone-800 dark:bg-[#1C1917] dark:shadow-none sm:grid-cols-3">
-            <label className="flex items-center justify-between gap-3 rounded-xl bg-stone-50 px-3.5 py-2.5 dark:bg-[#141210]/70">
+          {/* Settings */}
+          <div className="grid grid-cols-1 gap-2.5 rounded-box border border-base-300 bg-base-100 p-3.5 sm:grid-cols-3">
+            <label className="flex items-center justify-between gap-3 rounded-box border border-base-300 bg-base-200/40 px-3 py-2">
               <div>
-                <div className="text-xs font-semibold text-stone-800 dark:text-stone-200">Auto-Count Bablas</div>
-                <div className="text-[11px] text-base-content/60">Hitung otomatis saat wajah tak dikenal keluar frame</div>
+                <div className="text-xs font-medium text-base-content">Catat Tamu Otomatis</div>
+                <div className="text-[11px] text-base-content/60">Hitung saat wajah tamu keluar frame</div>
               </div>
               <input
                 type="checkbox"
                 checked={autoBablas}
                 onChange={(e) => setAutoBablas(e.target.checked)}
-                className="h-4 w-4 accent-amber-500"
+                className="checkbox checkbox-xs checkbox-primary"
               />
             </label>
 
-            <label className="flex items-center justify-between gap-3 rounded-xl bg-stone-50 px-3.5 py-2.5 dark:bg-[#141210]/70">
+            <label className="flex items-center justify-between gap-3 rounded-box border border-base-300 bg-base-200/40 px-3 py-2">
               <div>
-                <div className="text-xs font-semibold text-stone-800 dark:text-stone-200">Cooldown Info</div>
-                <div className="text-[11px] text-base-content/60">Jeda notifikasi pengingat di layar</div>
+                <div className="text-xs font-medium text-base-content">Jeda Notifikasi</div>
+                <div className="text-[11px] text-base-content/60">Waktu tunggu pesan muncul</div>
               </div>
               <select
                 value={cooldownSec}
                 onChange={(e) => setCooldownSec(Number(e.target.value))}
-                className="rounded-lg border border-base-300 bg-base-100 px-2 py-1 text-xs text-stone-900 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100"
+                className="select select-bordered select-xs"
               >
-                <option value={5}>5 detik</option>
-                <option value={15}>15 detik</option>
-                <option value={30}>30 detik</option>
-                <option value={60}>60 detik</option>
+                <option value={5}>5 dtk</option>
+                <option value={15}>15 dtk</option>
+                <option value={30}>30 dtk</option>
+                <option value={60}>60 dtk</option>
               </select>
             </label>
 
-            <label className="flex items-center justify-between gap-3 rounded-xl bg-stone-50 px-3.5 py-2.5 dark:bg-[#141210]/70">
+            <label className="flex items-center justify-between gap-3 rounded-box border border-base-300 bg-base-200/40 px-3 py-2">
               <div>
-                <div className="text-xs font-semibold text-stone-800 dark:text-stone-200">Mode Cepat (Anti Lag)</div>
-                <div className="text-[11px] text-base-content/60">TinyFaceDetector agar FPS lancar</div>
+                <div className="text-xs font-medium text-base-content">Mode Cepat</div>
+                <div className="text-[11px] text-base-content/60">Deteksi ringan agar lebih lancar</div>
               </div>
               <input
                 type="checkbox"
                 checked={fastMode}
                 onChange={(e) => setFastMode(e.target.checked)}
-                className="h-4 w-4 accent-sky-500"
+                className="checkbox checkbox-xs checkbox-primary"
               />
             </label>
           </div>
         </div>
 
-        {/* Right Panel: Unknown Face Warning + Recent Activity Feed */}
+        {/* Right Panel */}
         <div className="space-y-4 lg:col-span-4">
-          {/* Unknown Face Prompt Card */}
           {unknownAlert ? (
-            <div className="rounded-2xl border-2 border-amber-300 bg-amber-50 p-4 shadow-md dark:border-amber-500/60 dark:bg-amber-950/40 dark:shadow-amber-950/30">
-              <div className="flex items-start gap-3">
-                <div className="rounded-xl bg-amber-100 p-2 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400">
-                  <ShieldAlert className="h-6 w-6" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-sm font-bold text-amber-800 dark:text-amber-300">
-                    Wajah Tidak Dikenal!
-                  </h3>
-                  <p className="mt-1 text-xs leading-relaxed text-amber-900/80 dark:text-amber-100/80">
-                    Wajah belum cocok di database (Sync DB: <strong>{unknownAlert.confidence}%</strong>).{' '}
-                    <strong>Wajib registrasi terlebih dahulu</strong> sebelum masuk, atau hitung sebagai pengunjung tidak terdaftar jika tetap bablas.
-                  </p>
-                </div>
-              </div>
-
-              {unknownAlert.snapshotBase64 && (
-                <div className="mt-3 flex items-center gap-3 rounded-xl bg-white p-2.5 ring-1 ring-amber-200 dark:bg-[#141210]/70 dark:ring-0">
-                  <img
-                    src={unknownAlert.snapshotBase64}
-                    alt="Wajah Tidak Dikenal"
-                    className="h-14 w-14 rounded-lg object-cover ring-2 ring-amber-500/50"
-                  />
-                  <div className="text-xs text-base-content/80">
-                    <div className="font-semibold text-base-content">
-                      Track #{unknownAlert.trackId}
-                    </div>
-                    <div className="text-amber-700 dark:text-amber-300">
-                      Sync DB: {unknownAlert.confidence}%
-                    </div>
+            <div className="card border border-warning bg-base-100">
+              <div className="card-body gap-3 p-4">
+                <div className="flex items-start gap-3">
+                  <ShieldAlert className="h-5 w-5 shrink-0 text-warning mt-0.5" />
+                  <div className="flex-1">
+                    <h3 className="text-sm font-semibold text-base-content">
+                      Wajah Belum Terdaftar
+                    </h3>
+                    <p className="mt-0.5 text-xs text-base-content/70">
+                      Kemiripan {unknownAlert.confidence}%. Daftarkan sebagai anggota atau catat sebagai tamu.
+                    </p>
                   </div>
                 </div>
-              )}
 
-              <div className="mt-3 flex flex-col gap-2">
-                <button
-                  type="button"
-                  onClick={() =>
-                    onQuickRegister?.({
-                      fromAdmin: true,
-                      workspace,
-                      descriptor: unknownAlert.descriptor,
-                      sfaceDescriptor: unknownAlert.sfaceDescriptor,
-                      photoBase64: unknownAlert.snapshotBase64,
-                    })
-                  }
-                  className={`inline-flex w-full items-center justify-center gap-2 rounded-xl px-3 py-2 text-xs font-bold transition ${wsMeta.accentSolidClass}`}
-                >
-                  <UserPlus className="h-4 w-4" />
-                  Wajib Regis — Daftar Wajah Ini
-                </button>
-                <button
-                  type="button"
-                  onClick={handleManualBablas}
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-amber-300 bg-white px-3 py-2 text-xs font-semibold text-amber-800 transition hover:bg-amber-100 dark:border-amber-500/40 dark:bg-amber-500/15 dark:text-amber-200 dark:hover:bg-amber-500/25"
-                >
-                  <Footprints className="h-4 w-4" />
-                  Tetap Bablas (Hitung Tanpa Regis)
-                </button>
+                {unknownAlert.snapshotBase64 && (
+                  <div className="flex items-center gap-3 rounded-box border border-base-300 bg-base-200/50 p-2.5">
+                    <img
+                      src={unknownAlert.snapshotBase64}
+                      alt="Wajah Tamu"
+                      className="h-12 w-12 rounded-box object-cover border border-warning"
+                    />
+                    <div className="text-xs text-base-content/80">
+                      <div className="font-medium text-base-content">
+                        Deteksi #{unknownAlert.trackId}
+                      </div>
+                      <div className="text-warning">
+                        Kemiripan: {unknownAlert.confidence}%
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex flex-col gap-2">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      onQuickRegister?.({
+                        fromAdmin: true,
+                        workspace,
+                        descriptor: unknownAlert.descriptor,
+                        sfaceDescriptor: unknownAlert.sfaceDescriptor,
+                        photoBase64: unknownAlert.snapshotBase64,
+                      })
+                    }
+                    className="btn btn-sm btn-primary w-full gap-1.5"
+                  >
+                    <UserPlus className="h-3.5 w-3.5" />
+                    Daftarkan Wajah
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleManualBablas}
+                    className="btn btn-sm btn-ghost border border-base-300 w-full gap-1.5 font-normal"
+                  >
+                    <Footprints className="h-3.5 w-3.5" />
+                    Catat sebagai Tamu
+                  </button>
+                </div>
               </div>
             </div>
           ) : (
-            <div className="rounded-2xl border border-stone-200 bg-white p-4 shadow-sm dark:border-stone-800 dark:bg-[#1C1917] dark:shadow-none">
-              <div className="flex items-center gap-2.5 text-sm font-semibold text-stone-900 dark:text-stone-200">
-                <ShieldAlert className="h-4 w-4 text-sky-600 dark:text-sky-400" />
-                Aturan Gerbang Wajah
+            <div className="card border border-base-300 bg-base-100">
+              <div className="card-body gap-2 p-4">
+                <div className="flex items-center gap-2 text-sm font-semibold text-base-content">
+                  <ShieldAlert className="h-4 w-4 text-primary" />
+                  Cara Kerja
+                </div>
+                <ul className="space-y-1 text-xs text-base-content/70">
+                  <li>1. Wajah dikenali dicatat otomatis (1x per sesi).</li>
+                  <li>2. Wajah belum dikenal bisa langsung didaftarkan.</li>
+                  <li>3. Jika tidak didaftarkan, tercatat sebagai tamu.</li>
+                </ul>
               </div>
-              <ul className="mt-2.5 space-y-1.5 text-xs text-stone-600 dark:text-stone-400">
-                <li>1. Wajah dikenali → Kotak hijau + nama + Sync DB (%) &amp; presensi 1x/hari.</li>
-                <li>2. Wajah tidak dikenal → Peringatan wajib registrasi dahulu.</li>
-                <li>3. Jika tetap bablas → Otomatis terhitung sebagai <span className="font-semibold text-amber-700 dark:text-amber-300">Tidak Terdaftar</span>.</li>
-              </ul>
             </div>
           )}
 
           {/* Live Recent Logs */}
-          <div className="rounded-2xl border border-stone-200 bg-white p-4 shadow-sm dark:border-stone-800 dark:bg-[#1C1917] dark:shadow-none">
-            <div className="mb-3 flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-base-content">
-                Log Masuk Terbaru (Hari Ini)
-              </h3>
-              <button
-                type="button"
-                onClick={loadMatcherAndStats}
-                className="rounded-lg p-1.5 text-stone-500 hover:bg-stone-100 hover:text-stone-900 dark:text-stone-400 dark:hover:bg-stone-800 dark:hover:text-white"
-                title="Refresh"
-              >
-                <RefreshCw className="h-3.5 w-3.5" />
-              </button>
-            </div>
+          <div className="card border border-base-300 bg-base-100">
+            <div className="card-body gap-3 p-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-semibold text-base-content">
+                  Log Hari Ini
+                </h3>
+                <button
+                  type="button"
+                  onClick={loadMatcherAndStats}
+                  className="btn btn-xs btn-ghost btn-square"
+                  title="Refresh"
+                >
+                  <RefreshCw className="h-3.5 w-3.5" />
+                </button>
+              </div>
 
-            {recentLogs.length === 0 ? (
-              <div className="py-8 text-center text-xs text-stone-500">
-                Belum ada orang tercatat masuk hari ini.
-              </div>
-            ) : (
-              <div className="max-h-[380px] space-y-2.5 overflow-y-auto pr-1">
-                {recentLogs.map((log) => (
-                  <div
-                    key={log._id}
-                    className="flex items-center gap-3 rounded-xl border border-stone-200 bg-stone-50 p-2.5 dark:border-stone-800/80 dark:bg-[#141210]/70"
-                  >
-                    {log.snapshotBase64 ? (
-                      <img
-                        src={log.snapshotBase64}
-                        alt={log.personName}
-                        className="h-10 w-10 shrink-0 rounded-lg object-cover"
-                      />
-                    ) : (
-                      <div
-                        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${
-                          log.status === 'REGISTERED'
-                            ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400'
-                            : 'bg-amber-50 text-amber-600 dark:bg-amber-500/15 dark:text-amber-400'
-                        }`}
-                      >
-                        {log.status === 'REGISTERED' ? (
-                          <UserCheck className="h-5 w-5" />
-                        ) : (
-                          <UserX className="h-5 w-5" />
-                        )}
-                      </div>
-                    )}
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center justify-between gap-2">
-                        <p className="truncate text-xs font-semibold text-base-content">
-                          {log.personName}
+              {recentLogs.length === 0 ? (
+                <div className="py-6 text-center text-xs text-base-content/60">
+                  Belum ada catatan hari ini.
+                </div>
+              ) : (
+                <div className="max-h-[380px] space-y-2 overflow-y-auto pr-1">
+                  {recentLogs.map((log) => (
+                    <div
+                      key={log._id}
+                      className="flex items-center gap-3 rounded-box border border-base-300 bg-base-200/40 p-2.5"
+                    >
+                      {log.snapshotBase64 ? (
+                        <img
+                          src={log.snapshotBase64}
+                          alt={log.personName}
+                          className="h-10 w-10 shrink-0 rounded-box object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-box bg-base-200 text-base-content/60">
+                          {log.status === 'REGISTERED' ? (
+                            <UserCheck className="h-4 w-4 text-success" />
+                          ) : (
+                            <UserX className="h-4 w-4 text-warning" />
+                          )}
+                        </div>
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between gap-2">
+                          <p className="truncate text-xs font-semibold text-base-content">
+                            {log.personName}
+                          </p>
+                          <span
+                            className={`badge badge-xs shrink-0 ${
+                              log.status === 'REGISTERED'
+                                ? 'badge-success badge-outline'
+                                : 'badge-warning badge-outline'
+                            }`}
+                          >
+                            {log.status === 'REGISTERED'
+                              ? `${log.confidence}%`
+                              : 'Tamu'}
+                          </span>
+                        </div>
+                        <p className="mt-0.5 text-[11px] text-base-content/60">
+                          {new Date(log.enteredAt).toLocaleTimeString('id-ID', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit',
+                          })}{' '}
+                          • {log.department}
                         </p>
-                        <span
-                          className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ${
-                            log.status === 'REGISTERED'
-                              ? 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:ring-0'
-                              : 'bg-amber-50 text-amber-700 ring-1 ring-amber-200 dark:bg-amber-500/15 dark:text-amber-300 dark:ring-0'
-                          }`}
-                        >
-                          {log.status === 'REGISTERED'
-                            ? `Sync ${log.confidence}%`
-                            : 'Bablas'}
-                        </span>
                       </div>
-                      <p className="mt-0.5 text-[11px] text-base-content/60">
-                        {new Date(log.enteredAt).toLocaleTimeString('id-ID', {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                          second: '2-digit',
-                        })}{' '}
-                        • {log.department}
-                      </p>
                     </div>
-                  </div>
-                ))}
-              </div>
-            )}
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

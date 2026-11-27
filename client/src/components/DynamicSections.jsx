@@ -115,18 +115,18 @@ export default function DynamicSections({
   return (
     <div className="space-y-4">
       {canManage && (
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-box border border-base-300 bg-base-100 p-4 shadow-sm">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-box border border-base-300 bg-base-100 p-4">
           <div>
-            <h3 className="text-sm font-bold text-base-content">
-              Kelola Section Tambahan ({visibleSections.length})
+            <h3 className="text-sm font-semibold text-base-content">
+              Konten Tambahan ({visibleSections.length})
             </h3>
             <p className="text-xs text-base-content/65">
-              Tambahkan kartu jadwal ibadah, pengumuman, target jemaat, atau panduan ke Portal (/), Ruang Gereja, maupun Mode Piloting.
+              Tambahkan pengumuman, jadwal, atau catatan ke halaman Portal, Gereja, atau Piloting.
             </p>
           </div>
           <button type="button" onClick={openNewModal} className="btn btn-primary btn-sm gap-1.5">
             <Plus className="h-4 w-4" />
-            Add Section
+            Tambah Konten
           </button>
         </div>
       )}
@@ -433,7 +433,7 @@ export default function DynamicSections({
                   Batal
                 </button>
                 <button type="submit" className="btn btn-primary btn-sm">
-                  Simpan Section ke MongoDB
+                  Simpan
                 </button>
               </div>
             </form>

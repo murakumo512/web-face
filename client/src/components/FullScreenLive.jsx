@@ -613,39 +613,41 @@ export default function FullScreenLive({
       {!cameraActive && (
         <div className="absolute inset-0 z-10 flex items-start justify-center overflow-y-auto bg-base-200 px-4 py-6 sm:items-center">
           {skipSchedule ? (
-            <div className="w-full max-w-sm rounded-md border border-base-300 bg-base-100 p-5 text-center shadow-sm">
-              <h2 className="text-base font-semibold text-base-content">Kamera Testing Siap</h2>
-              {cameraError && (
-                <p className="mt-2 rounded-md border border-rose-300 bg-rose-50 px-3 py-2 text-xs text-rose-700 dark:border-rose-800 dark:bg-rose-950/60 dark:text-rose-300">
-                  {cameraError}
-                </p>
-              )}
-              <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
-                {onGoToPortal && (
+            <div className="card w-full max-w-sm border border-base-300 bg-base-100">
+              <div className="card-body p-5 text-center gap-3">
+                <h2 className="text-base font-semibold text-base-content">Kamera Testing</h2>
+                {cameraError && (
+                  <div className="alert alert-error py-2 text-xs">
+                    <span>{cameraError}</span>
+                  </div>
+                )}
+                <div className="mt-1 flex flex-wrap items-center justify-center gap-2">
+                  {onGoToPortal && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        stopCamera();
+                        onGoToPortal();
+                      }}
+                      className="btn btn-sm btn-ghost border border-base-300 font-normal gap-1.5"
+                    >
+                      <ArrowLeft className="h-3.5 w-3.5" />
+                      <span>Kembali</span>
+                    </button>
+                  )}
                   <button
                     type="button"
+                    disabled={!engineReady}
                     onClick={() => {
-                      stopCamera();
-                      onGoToPortal();
+                      userStoppedRef.current = false;
+                      startCamera();
                     }}
-                    className="inline-flex h-9 items-center gap-1.5 rounded-md border border-base-300 bg-base-100 px-3 text-xs font-medium text-base-content hover:bg-base-200"
+                    className="btn btn-sm btn-primary gap-1.5"
                   >
-                    <ArrowLeft className="h-3.5 w-3.5" />
-                    <span>Portal</span>
+                    <Camera className="h-3.5 w-3.5" />
+                    <span>{engineReady ? 'Buka Kamera' : 'Menyiapkan...'}</span>
                   </button>
-                )}
-                <button
-                  type="button"
-                  disabled={!engineReady}
-                  onClick={() => {
-                    userStoppedRef.current = false;
-                    startCamera();
-                  }}
-                  className="inline-flex h-9 items-center gap-1.5 rounded-md bg-emerald-600 px-4 text-xs font-medium text-white hover:bg-emerald-700 disabled:opacity-50"
-                >
-                  <Camera className="h-3.5 w-3.5" />
-                  <span>{engineReady ? 'Buka Kamera' : 'Menyiapkan...'}</span>
-                </button>
+                </div>
               </div>
             </div>
           ) : (
@@ -675,10 +677,10 @@ export default function FullScreenLive({
         </div>
       )}
 
-      {/* Mobile Compact Top HUD (Shown during live scan on phones) */}
+      {/* Mobile Compact Top HUD */}
       {cameraActive && (
         <div className="pointer-events-none absolute inset-x-0 top-0 z-20 p-2.5 sm:hidden">
-          <div className="pointer-events-auto flex items-center justify-between gap-2 rounded-lg border border-base-300/80 bg-base-100/90 px-2.5 py-2 text-xs text-base-content shadow-md backdrop-blur-md">
+          <div className="pointer-events-auto flex items-center justify-between gap-2 rounded-box border border-base-300 bg-base-100/95 px-2.5 py-2 text-xs text-base-content shadow-sm">
             <div className="flex min-w-0 items-center gap-2">
               {onGoToPortal && (
                 <button
@@ -687,32 +689,32 @@ export default function FullScreenLive({
                     stopCamera();
                     onGoToPortal();
                   }}
-                  className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-base-300 bg-base-100 text-base-content active:scale-95"
-                  title="Kembali ke Portal"
+                  className="btn btn-sm btn-square btn-ghost border border-base-300 shrink-0"
+                  title="Kembali"
                 >
                   <ArrowLeft className="h-4 w-4" />
                 </button>
               )}
               <div className="min-w-0">
                 <div className="flex items-center gap-1.5 font-semibold leading-tight">
-                  <span className="h-2 w-2 shrink-0 rounded-full bg-emerald-500" />
+                  <span className="h-2 w-2 shrink-0 rounded-full bg-success" />
                   <span className="truncate">
                     {skipSchedule ? 'Testing' : workspace === 'gereja' ? 'Gereja' : 'Piloting'}
                   </span>
                   {!skipSchedule && (
-                    <span className="text-[10px] font-medium text-base-content/60 tabular-nums">
+                    <span className="text-[10px] font-normal text-base-content/60">
                       {clockLabel}
                     </span>
                   )}
                 </div>
-                <div className="mt-0.5 flex items-center gap-2 text-[11px] tabular-nums">
+                <div className="mt-0.5 flex items-center gap-2 text-[11px]">
                   <span className="text-base-content/75">
                     Total <strong className="text-base-content">{summary.totalCount}</strong>
                   </span>
-                  <span className="text-emerald-700 dark:text-emerald-400">
+                  <span className="text-success">
                     Hadir <strong>{summary.registeredCount}</strong>
                   </span>
-                  <span className="text-amber-700 dark:text-amber-400">
+                  <span className="text-warning">
                     Tamu <strong>{summary.unregisteredCount}</strong>
                   </span>
                 </div>
@@ -733,10 +735,10 @@ export default function FullScreenLive({
         </div>
       )}
 
-      {/* Mobile Bottom Camera Controls Bar (Thumb-friendly) */}
+      {/* Mobile Bottom Camera Controls Bar */}
       {cameraActive && (
         <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 p-3 sm:hidden">
-          <div className="pointer-events-auto mx-auto flex max-w-md items-center justify-between gap-1.5 rounded-xl border border-base-300/80 bg-base-100/92 px-2.5 py-2 shadow-lg backdrop-blur-md">
+          <div className="pointer-events-auto mx-auto flex max-w-md items-center justify-between gap-1.5 rounded-box border border-base-300 bg-base-100/95 px-2.5 py-2 shadow-sm">
             <div className="flex items-center gap-1.5">
               {devices.length > 1 && (
                 <button
@@ -749,8 +751,8 @@ export default function FullScreenLive({
                       if (cameraActive) startCamera(nextDevice.deviceId);
                     }
                   }}
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-base-300 bg-base-100 text-base-content active:scale-95"
-                  title="Ganti Kamera (Depan/Belakang)"
+                  className="btn btn-square h-10 w-10 min-h-0 btn-ghost border border-base-300"
+                  title="Ganti Kamera"
                 >
                   <SwitchCamera className="h-4 w-4" />
                 </button>
@@ -769,12 +771,12 @@ export default function FullScreenLive({
                     return next;
                   })
                 }
-                className={`inline-flex h-10 w-10 items-center justify-center rounded-lg border transition active:scale-95 ${
+                className={`btn btn-square h-10 w-10 min-h-0 ${
                   mirrorCamera
-                    ? 'border-emerald-600 bg-emerald-600 text-white'
-                    : 'border-base-300 bg-base-100 text-base-content'
+                    ? 'btn-primary'
+                    : 'btn-ghost border border-base-300'
                 }`}
-                title="Flip / Mirror Kamera"
+                title="Mirror Kamera"
               >
                 <FlipHorizontal2 className="h-4 w-4" />
               </button>
@@ -782,11 +784,11 @@ export default function FullScreenLive({
               <button
                 type="button"
                 onClick={() => setSoundEnabled((s) => !s)}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-base-300 bg-base-100 text-base-content active:scale-95"
+                className="btn btn-square h-10 w-10 min-h-0 btn-ghost border border-base-300"
                 title={soundEnabled ? 'Matikan suara' : 'Aktifkan suara'}
               >
                 {soundEnabled ? (
-                  <Volume2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                  <Volume2 className="h-4 w-4 text-primary" />
                 ) : (
                   <VolumeX className="h-4 w-4 text-base-content/40" />
                 )}
@@ -800,7 +802,7 @@ export default function FullScreenLive({
                   userStoppedRef.current = true;
                   stopCamera();
                 }}
-                className="inline-flex h-10 items-center gap-1.5 rounded-lg bg-rose-600 px-3.5 text-xs font-semibold text-white active:scale-95"
+                className="btn h-10 min-h-0 btn-error gap-1.5 px-3.5 text-xs"
               >
                 <CameraOff className="h-4 w-4" />
                 <span>Stop</span>
@@ -812,7 +814,7 @@ export default function FullScreenLive({
                   stopCamera();
                   onGoToAdmin?.();
                 }}
-                className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-base-300 bg-base-100 px-3 text-xs font-medium text-base-content active:scale-95"
+                className="btn h-10 min-h-0 btn-ghost border border-base-300 gap-1.5 px-3 text-xs font-normal"
               >
                 <LayoutDashboard className="h-4 w-4" />
                 <span>Admin</span>
@@ -822,16 +824,16 @@ export default function FullScreenLive({
         </div>
       )}
 
-      {/* Desktop / Tablet Toolbar-style Top HUD (Shown during live scan) */}
+      {/* Desktop / Tablet Toolbar-style Top HUD */}
       {cameraActive && (
         <div className="pointer-events-none hidden sm:block absolute inset-x-0 top-0 z-20 px-4 pt-3">
-        <div className="pointer-events-auto mx-auto flex flex-wrap items-center justify-between gap-2 rounded-md border border-base-300 bg-base-100/95 px-2.5 py-1.5 text-xs text-base-content shadow-sm backdrop-blur-sm">
+        <div className="pointer-events-auto mx-auto flex flex-wrap items-center justify-between gap-2 rounded-box border border-base-300 bg-base-100/95 px-2.5 py-1.5 text-xs text-base-content shadow-sm">
           {/* Left: Status, Time Session & Counters */}
           <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
             <span className="inline-flex items-center gap-1.5 font-semibold">
               <span
                 className={`h-2 w-2 rounded-full ${
-                  cameraActive ? 'bg-emerald-500' : 'bg-base-content/30'
+                  cameraActive ? 'bg-success' : 'bg-base-content/30'
                 }`}
               />
               <span>{skipSchedule ? 'Testing' : workspace === 'gereja' ? 'Gereja' : 'Piloting'}</span>
@@ -840,15 +842,9 @@ export default function FullScreenLive({
             {!skipSchedule && (
               <>
                 <span className="h-3.5 w-px bg-base-300" />
-                <span className="inline-flex items-center gap-1.5 tabular-nums">
+                <span className="inline-flex items-center gap-1.5">
                   <span className="font-medium">{clockLabel}</span>
-                  <span
-                    className={`rounded border px-1.5 py-0.5 text-[11px] font-medium ${
-                      churchSessionLabel === 'Gereja Pagi'
-                        ? 'border-sky-200 bg-sky-50 text-sky-700 dark:border-sky-800 dark:bg-sky-950/60 dark:text-sky-300'
-                        : 'border-indigo-200 bg-indigo-50 text-indigo-700 dark:border-indigo-800 dark:bg-indigo-950/60 dark:text-indigo-300'
-                    }`}
-                  >
+                  <span className="badge badge-outline badge-xs font-medium">
                     {churchSessionLabel}
                   </span>
                 </span>
@@ -857,17 +853,17 @@ export default function FullScreenLive({
 
             <span className="h-3.5 w-px bg-base-300" />
 
-            <div className="flex items-center gap-2.5 tabular-nums">
+            <div className="flex items-center gap-2.5">
               <span className="text-base-content/75">
-                DB <strong className="text-base-content">{registeredUsersCount}</strong>
+                Terdaftar <strong className="text-base-content">{registeredUsersCount}</strong>
               </span>
               <span className="text-base-content/75">
                 Total <strong className="text-base-content">{summary.totalCount}</strong>
               </span>
-              <span className="text-emerald-700 dark:text-emerald-400">
+              <span className="text-success">
                 Hadir <strong>{summary.registeredCount}</strong>
               </span>
-              <span className="text-amber-700 dark:text-amber-400">
+              <span className="text-warning">
                 Tamu <strong>{summary.unregisteredCount}</strong>
               </span>
             </div>
@@ -891,8 +887,8 @@ export default function FullScreenLive({
                   stopCamera();
                   onGoToPortal();
                 }}
-                className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-base-300 bg-base-100 text-base-content hover:bg-base-200"
-                title="Kembali ke Portal (/)"
+                className="btn btn-sm btn-square btn-ghost border border-base-300"
+                title="Kembali"
               >
                 <ArrowLeft className="h-3.5 w-3.5" />
               </button>
@@ -905,7 +901,7 @@ export default function FullScreenLive({
                   setSelectedDeviceId(e.target.value);
                   if (cameraActive) startCamera(e.target.value);
                 }}
-                className="h-8 max-w-[130px] rounded-md border border-base-300 bg-base-100 px-2 text-xs text-base-content focus:outline-none sm:max-w-[180px]"
+                className="select select-bordered select-sm max-w-[160px] text-xs"
               >
                 {devices.map((d, idx) => (
                   <option key={d.deviceId} value={d.deviceId}>
@@ -918,11 +914,11 @@ export default function FullScreenLive({
             <button
               type="button"
               onClick={() => setSoundEnabled((s) => !s)}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-base-300 bg-base-100 text-base-content hover:bg-base-200"
+              className="btn btn-sm btn-square btn-ghost border border-base-300"
               title={soundEnabled ? 'Matikan suara' : 'Aktifkan suara'}
             >
               {soundEnabled ? (
-                <Volume2 className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                <Volume2 className="h-3.5 w-3.5 text-primary" />
               ) : (
                 <VolumeX className="h-3.5 w-3.5 text-base-content/40" />
               )}
@@ -941,10 +937,10 @@ export default function FullScreenLive({
                   return next;
                 })
               }
-              className={`inline-flex h-8 w-8 items-center justify-center rounded-md border transition ${
+              className={`btn btn-sm btn-square ${
                 mirrorCamera
-                  ? 'border-emerald-600 bg-emerald-600 text-white'
-                  : 'border-base-300 bg-base-100 text-base-content hover:bg-base-200'
+                  ? 'btn-primary'
+                  : 'btn-ghost border border-base-300'
               }`}
               title={mirrorCamera ? 'Kamera Flip / Mirror: ON' : 'Kamera Normal (tidak mirror)'}
             >
@@ -957,8 +953,8 @@ export default function FullScreenLive({
                 userStoppedRef.current = true;
                 stopCamera();
               }}
-              className="inline-flex h-8 items-center gap-1 rounded-md bg-rose-600 px-2.5 text-xs font-medium text-white hover:bg-rose-700 whitespace-nowrap"
-              title={skipSchedule ? 'Hentikan kamera' : 'Stop kamera / ubah tanggal & jam ibadah'}
+              className="btn btn-sm btn-error gap-1 whitespace-nowrap"
+              title={skipSchedule ? 'Hentikan kamera' : 'Stop kamera / ubah jadwal'}
             >
               <CameraOff className="h-3.5 w-3.5" />
               <span>{skipSchedule ? 'Stop' : 'Stop / Jadwal'}</span>
@@ -970,7 +966,7 @@ export default function FullScreenLive({
                 stopCamera();
                 onGoToAdmin?.();
               }}
-              className="inline-flex h-8 items-center gap-1.5 rounded-md border border-base-300 bg-base-100 px-2.5 text-xs font-medium text-base-content hover:bg-base-200 whitespace-nowrap"
+              className="btn btn-sm btn-ghost border border-base-300 font-normal gap-1.5 whitespace-nowrap"
             >
               <LayoutDashboard className="h-3.5 w-3.5" />
               <span>Admin {wsCfg.shortLabel || wsMeta.shortLabel}</span>
@@ -980,36 +976,34 @@ export default function FullScreenLive({
       </div>
       )}
 
-      {/* PrimeVue Toast Notification */}
+      {/* Toast Notification */}
       {toast && (
         <div
-          className={`absolute left-1/2 top-16 z-30 flex w-[92%] max-w-md -translate-x-1/2 items-center justify-center gap-2 rounded-md border px-3.5 py-2 text-xs font-medium shadow-md sm:top-16 sm:w-auto sm:text-sm ${
-            toast.type === 'success'
-              ? 'border-emerald-300 bg-base-100 text-emerald-700 dark:border-emerald-700 dark:text-emerald-300'
-              : 'border-amber-300 bg-base-100 text-amber-700 dark:border-amber-700 dark:text-amber-300'
+          className={`alert fixed left-1/2 top-16 z-30 w-[92%] max-w-md -translate-x-1/2 py-2.5 text-xs shadow-md sm:w-auto sm:text-sm ${
+            toast.type === 'success' ? 'alert-success' : 'alert-warning'
           }`}
         >
           {toast.type === 'success' ? (
-            <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+            <CheckCircle2 className="h-4 w-4 shrink-0" />
           ) : (
-            <AlertTriangle className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
+            <AlertTriangle className="h-4 w-4 shrink-0" />
           )}
           <span className="truncate">{toast.text}</span>
         </div>
       )}
 
-      {/* PrimeVue Panel Bottom Bar when Unknown Face Detected */}
+      {/* Unknown Face Detected */}
       {unknownAlert && (
-        <div className="absolute bottom-20 sm:bottom-4 left-1/2 z-30 flex w-[94%] max-w-xl -translate-x-1/2 flex-wrap items-center justify-between gap-2.5 rounded-lg border border-amber-300 bg-base-100/95 px-3.5 py-2.5 shadow-lg backdrop-blur-md dark:border-amber-700 sm:px-4">
+        <div className="fixed bottom-20 sm:bottom-4 left-1/2 z-30 flex w-[94%] max-w-xl -translate-x-1/2 flex-wrap items-center justify-between gap-2.5 rounded-box border border-warning bg-base-100 px-3.5 py-2.5 shadow-md sm:px-4">
           <div className="flex items-center gap-3">
             {unknownAlert.snapshotBase64 ? (
               <img
                 src={unknownAlert.snapshotBase64}
-                alt="Unknown"
-                className="h-11 w-11 rounded-md object-cover border border-amber-400"
+                alt="Wajah Tamu"
+                className="h-11 w-11 rounded-box object-cover border border-warning"
               />
             ) : (
-              <ShieldAlert className="h-7 w-7 text-amber-600 dark:text-amber-400" />
+              <ShieldAlert className="h-7 w-7 text-warning" />
             )}
             <div>
               <div className="text-xs font-semibold text-base-content">
@@ -1033,7 +1027,7 @@ export default function FullScreenLive({
                   photoBase64: unknownAlert.snapshotBase64,
                 });
               }}
-              className="inline-flex h-8 items-center gap-1.5 rounded-md bg-emerald-600 px-3 text-xs font-medium text-white hover:bg-emerald-700"
+              className="btn btn-sm btn-primary gap-1.5"
             >
               <UserPlus className="h-3.5 w-3.5" />
               Daftar
@@ -1041,7 +1035,7 @@ export default function FullScreenLive({
             <button
               type="button"
               onClick={handleManualBablas}
-              className="inline-flex h-8 items-center gap-1.5 rounded-md border border-base-300 bg-base-100 px-3 text-xs font-medium text-base-content hover:bg-base-200"
+              className="btn btn-sm btn-ghost border border-base-300 font-normal gap-1.5"
             >
               <Footprints className="h-3.5 w-3.5" />
               Catat Tamu

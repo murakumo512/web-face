@@ -1,6 +1,8 @@
 import { Camera, LayoutDashboard, ScanFace, UserPlus } from 'lucide-react';
 import { useSiteConfig } from '../context/SiteConfigContext.jsx';
+import { WorkspaceIcon } from './BrandLogo.jsx';
 import DynamicSections from './DynamicSections.jsx';
+import ThemePicker from './ThemePicker.jsx';
 
 export default function EntryPortal({ navigate }) {
   const { config } = useSiteConfig();
@@ -14,7 +16,7 @@ export default function EntryPortal({ navigate }) {
   const rawHeading = config.portalHeading;
   const portalHeading =
     !rawHeading || rawHeading === 'Silakan pilih tujuan penggunaan hari ini.'
-      ? 'Pilih Ruang'
+      ? 'Pilih Ruang Kerja'
       : rawHeading;
 
   const rawGerejaTitle = config.workspaces?.gereja?.title;
@@ -25,119 +27,127 @@ export default function EntryPortal({ navigate }) {
   const pilotingTitle =
     !rawPilotingTitle || rawPilotingTitle === 'Piloting & Pengujian' ? 'Piloting' : rawPilotingTitle;
 
+  const rawTestingTitle = config.workspaces?.testing?.title;
+  const testingTitle =
+    !rawTestingTitle || rawTestingTitle === 'Testing Kamera' ? 'Testing' : rawTestingTitle;
+
   const cards = [
     {
       key: 'gereja',
       title: gerejaTitle,
-      imageSrc: '/assets/church.png',
-      imageAlt: 'Gereja',
-      stageClass: 'bg-white',
-      imgClass: 'max-h-40 w-auto object-contain',
+      description: 'Presensi jemaat, pendeta, majelis & pelayan ibadah.',
       livePath: '/gereja/live',
       registerPath: '/gereja/register',
-      primaryLabel: 'Kamera',
+      adminPath: '/gereja/admin',
     },
     {
       key: 'piloting',
       title: pilotingTitle,
-      imageSrc: '/assets/code.png',
-      imageAlt: 'Piloting',
-      stageClass: 'bg-black',
-      imgClass: 'max-h-40 w-full object-contain',
+      description: 'Simulasi presensi dan uji operasional harian.',
       livePath: '/piloting/live',
       registerPath: '/piloting/register',
-      primaryLabel: 'Kamera',
+      adminPath: '/piloting/admin',
     },
     {
       key: 'testing',
-      title: 'Testing',
-      imageSrc: null,
-      imageAlt: 'Testing Kamera',
-      stageClass: 'bg-zinc-900 text-zinc-100',
-      imgClass: '',
+      title: testingTitle,
+      description: 'Uji kamera dan kalibrasi deteksi wajah terpisah.',
       livePath: '/testing/live',
-      registerPath: '/piloting/register',
-      primaryLabel: 'Kamera',
+      registerPath: '/testing/register',
+      adminPath: '/testing/admin',
     },
   ];
 
   return (
     <div className="min-h-[100dvh] bg-base-200 text-base-content flex flex-col">
-      {/* PrimeVue-inspired Minimal Header */}
-      <header className="sticky top-0 z-20 border-b border-base-300 bg-base-100/95 backdrop-blur-sm">
-        <div className="mx-auto flex h-13 sm:h-14 max-w-5xl items-center justify-between px-3.5 sm:px-6">
-          <span className="text-sm font-semibold tracking-tight text-base-content">
-            {portalTitle}
-          </span>
+      <header className="sticky top-0 z-20 border-b border-base-300 bg-base-100">
+        <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4 sm:px-6">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-box border border-base-300 bg-base-200 text-primary">
+              <ScanFace className="h-4 w-4" strokeWidth={1.8} />
+            </div>
+            <span className="truncate text-sm font-semibold text-base-content">
+              {portalTitle}
+            </span>
+          </div>
 
-          <button
-            type="button"
-            onClick={() => navigate('/admin')}
-            className="inline-flex h-9 items-center gap-1.5 rounded-md border border-base-300 bg-base-100 px-3 text-xs font-medium text-base-content transition hover:bg-base-200 active:scale-[0.98]"
-          >
-            <LayoutDashboard className="h-3.5 w-3.5" />
-            <span>Admin</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <ThemePicker compact />
+            <button
+              type="button"
+              onClick={() => navigate('/admin')}
+              className="btn btn-sm btn-outline border-base-300 font-medium gap-1.5"
+            >
+              <LayoutDashboard className="h-3.5 w-3.5" />
+              <span>Admin</span>
+            </button>
+          </div>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col justify-start sm:justify-center px-3.5 py-5 sm:px-6 sm:py-10">
-        <div className="mb-4 sm:mb-6">
-          <h1 className="text-lg font-semibold tracking-tight text-base-content sm:text-2xl">
+      <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col justify-start sm:justify-center px-4 py-6 sm:px-6 sm:py-10">
+        <div className="mb-5 sm:mb-6">
+          <h1 className="text-lg font-semibold text-base-content sm:text-xl">
             {portalHeading}
           </h1>
+          <p className="mt-1 text-xs text-base-content/65 sm:text-sm">
+            Setiap ruang memiliki data anggota dan log kehadiran yang terpisah.
+          </p>
         </div>
 
-        <section className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 sm:gap-5 md:grid-cols-3">
+        <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 md:grid-cols-3">
           {cards.map((card) => (
             <div
               key={card.key}
-              className="flex flex-col overflow-hidden rounded-md border border-base-300 bg-base-100 shadow-sm transition hover:border-base-content/30"
+              className="card border border-base-300 bg-base-100 transition-colors hover:border-base-content/25"
             >
-              {/* Clean Visual Header */}
-              <button
-                type="button"
-                onClick={() => navigate(card.livePath)}
-                className={`flex h-28 sm:h-44 w-full cursor-pointer items-center justify-center border-b border-base-300 p-3 sm:p-4 transition hover:opacity-95 ${card.stageClass}`}
-                title={`Buka ${card.title}`}
-              >
-                {card.imageSrc ? (
-                  <img
-                    src={card.imageSrc}
-                    alt={card.imageAlt}
-                    className="max-h-20 sm:max-h-36 w-auto object-contain"
-                  />
-                ) : (
-                  <div className="flex flex-col items-center justify-center gap-1.5 sm:gap-2 text-center">
-                    <ScanFace className="h-9 w-9 sm:h-12 sm:w-12 text-emerald-400" strokeWidth={1.6} />
-                    <span className="font-mono text-[11px] sm:text-xs tracking-widest text-zinc-400">
-                      LIVE TEST
-                    </span>
-                  </div>
-                )}
-              </button>
-
-              {/* PrimeVue Card Body & Footer */}
-              <div className="flex flex-1 flex-col justify-between gap-3 sm:gap-4 p-3.5 sm:p-4">
-                <h2 className="text-sm sm:text-base font-semibold text-base-content">{card.title}</h2>
-
-                <div className="grid grid-cols-2 gap-2">
+              <div className="card-body justify-between gap-5 p-5">
+                <div className="flex items-start gap-3.5">
                   <button
                     type="button"
                     onClick={() => navigate(card.livePath)}
-                    className="inline-flex h-10 sm:h-9 items-center justify-center gap-1.5 rounded-md bg-emerald-600 px-3 text-xs font-medium text-white transition hover:bg-emerald-700 active:scale-[0.98]"
+                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-box border border-base-300 bg-base-200 text-primary transition hover:bg-base-300/70"
+                    title={`Buka Kamera ${card.title}`}
                   >
-                    <Camera className="h-3.5 w-3.5 shrink-0" />
-                    <span className="truncate">{card.primaryLabel}</span>
+                    <WorkspaceIcon workspace={card.key} className="h-5 w-5" />
                   </button>
+                  <div className="min-w-0">
+                    <h2 className="text-base font-semibold text-base-content leading-tight">
+                      {card.title}
+                    </h2>
+                    <p className="mt-1 text-xs leading-relaxed text-base-content/65">
+                      {card.description}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => navigate(card.livePath)}
+                      className="btn btn-sm h-10 btn-primary gap-1.5 font-medium"
+                    >
+                      <Camera className="h-3.5 w-3.5 shrink-0" />
+                      <span>Kamera</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => navigate(card.registerPath)}
+                      className="btn btn-sm h-10 btn-outline border-base-300 gap-1.5 font-medium"
+                    >
+                      <UserPlus className="h-3.5 w-3.5 shrink-0" />
+                      <span>Registrasi</span>
+                    </button>
+                  </div>
+
                   <button
                     type="button"
-                    onClick={() => navigate(card.registerPath)}
-                    className="inline-flex h-10 sm:h-9 items-center justify-center gap-1.5 rounded-md border border-base-300 bg-base-100 px-3 text-xs font-medium text-base-content transition hover:bg-base-200 active:scale-[0.98]"
+                    onClick={() => navigate(card.adminPath)}
+                    className="btn btn-xs h-8 w-full btn-ghost justify-between border border-base-200 bg-base-200/40 px-3 font-normal text-base-content/75 hover:bg-base-200"
                   >
-                    <UserPlus className="h-3.5 w-3.5 shrink-0" />
-                    <span>Registrasi</span>
+                    <span>Kelola Data {card.title}</span>
+                    <LayoutDashboard className="h-3.5 w-3.5 opacity-60" />
                   </button>
                 </div>
               </div>

@@ -50,7 +50,7 @@ export default function ChangePasswordModal({ open, onClose }) {
       <div className="modal-box max-w-md border border-base-300 bg-base-100">
         <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <div className="flex h-9 w-9 items-center justify-center rounded-box border border-base-300 bg-base-200 text-primary">
               <KeyRound className="h-4 w-4" />
             </div>
             <div>

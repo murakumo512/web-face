@@ -156,7 +156,13 @@ router.post('/', async (req, res) => {
       resolvedUserId = user._id;
       resolvedName = user.name;
       resolvedIdentifier = user.identifier || '-';
-      resolvedDepartment = user.department || (user.workspace === 'gereja' ? 'Ibadah Umum' : 'Umum');
+      resolvedDepartment =
+        user.department ||
+        (user.workspace === 'gereja'
+          ? 'Ibadah Umum'
+          : user.workspace === 'testing'
+            ? 'Testing'
+            : 'Umum');
       resolvedWilayah = user.wilayah || resolvedWilayah;
       resolvedWorkspace = normalizeWorkspace(user.workspace || workspace);
 

@@ -1,16 +1,13 @@
-/**
- * Bespoke SVG identity & shared domain configuration for Mardonius Riel.
- * Deliberately crafted with architectural hairline geometry — no generic neon gradients.
- */
+import { Church, ScanFace, SlidersHorizontal } from 'lucide-react';
 
 export const WORKSPACE_META = {
   gereja: {
     key: 'gereja',
-    shortLabel: 'Ruang Gereja',
-    title: 'Presensi & Counting Jemaat',
-    subtitle: 'Pencatatan kehadiran jemaat, pendeta, majelis & pelayan ibadah secara terpisah',
-    adminTitle: 'Ruang Gereja — Panel Administrasi',
-    adminSubtitle: 'Kelola Data Jemaat & Pendeta, Log Ibadah, serta Export Laporan CSV / PDF',
+    shortLabel: 'Gereja',
+    title: 'Gereja',
+    subtitle: 'Presensi jemaat, pendeta, majelis, dan pelayan ibadah',
+    adminTitle: 'Gereja — Panel Administrasi',
+    adminSubtitle: 'Kelola Data Jemaat & Pelayan, Log Ibadah, serta Export CSV / PDF',
     livePath: '/gereja/live',
     adminPath: '/gereja/admin',
     memberNoun: 'Jemaat / Pelayan',
@@ -28,18 +25,16 @@ export const WORKSPACE_META = {
       'Simpatisan / Tamu',
     ],
     unregisteredLabel: 'Tamu / Pengunjung Ibadah',
-    badgeClass:
-      'border-amber-800/30 bg-amber-900/10 text-amber-900 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200',
-    accentSolidClass:
-      'bg-[#7C2D12] text-[#FAF7F2] hover:bg-[#64220c] dark:bg-amber-700 dark:hover:bg-amber-600',
+    badgeClass: 'badge-secondary badge-outline',
+    accentSolidClass: 'btn-primary text-primary-content',
   },
   piloting: {
     key: 'piloting',
-    shortLabel: 'Mode Piloting',
-    title: 'Piloting & Pengujian',
-    subtitle: 'Area uji coba kamera, kalibrasi pengenalan wajah, dan simulasi presensi',
-    adminTitle: 'Piloting & Testing — Panel Administrasi',
-    adminSubtitle: 'Kelola Data Uji Coba, Log Simulasi, dan Export CSV / PDF',
+    shortLabel: 'Piloting',
+    title: 'Piloting',
+    subtitle: 'Simulasi presensi dan uji operasional harian',
+    adminTitle: 'Piloting — Panel Admin',
+    adminSubtitle: 'Kelola Data Piloting, Log Simulasi, dan Export CSV / PDF',
     livePath: '/piloting/live',
     adminPath: '/piloting/admin',
     memberNoun: 'Anggota',
@@ -49,16 +44,36 @@ export const WORKSPACE_META = {
     departmentPlaceholder: 'Misal: Teknik Informatika / Divisi IT / Umum',
     identifierPlaceholder: 'Opsional (NIM / NIP / ID)',
     roleOptions: ['Anggota', 'Karyawan', 'Mahasiswa / Siswa', 'Admin', 'Tamu VIP'],
-    unregisteredLabel: 'Tidak Terdaftar (Bablas)',
-    badgeClass:
-      'border-[#1E4D3B]/30 bg-[#1E4D3B]/10 text-[#1E4D3B] dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-200',
-    accentSolidClass:
-      'bg-[#1E4D3B] text-[#FAF7F2] hover:bg-[#173c2e] dark:bg-emerald-800 dark:hover:bg-emerald-700',
+    unregisteredLabel: 'Tamu (Belum Terdaftar)',
+    badgeClass: 'badge-primary badge-outline',
+    accentSolidClass: 'btn-primary text-primary-content',
+  },
+  testing: {
+    key: 'testing',
+    shortLabel: 'Testing',
+    title: 'Testing',
+    subtitle: 'Uji kamera, kalibrasi deteksi wajah, dan eksperimen',
+    adminTitle: 'Testing — Panel Admin',
+    adminSubtitle: 'Kelola Data Testing, Log Uji Kamera, dan Export CSV / PDF',
+    livePath: '/testing/live',
+    adminPath: '/testing/admin',
+    memberNoun: 'Tester',
+    membersNoun: 'Daftar Tester',
+    defaultDepartment: 'Testing',
+    defaultRole: 'Tester',
+    departmentPlaceholder: 'Misal: Uji Kamera / Lab / QA',
+    identifierPlaceholder: 'Opsional (ID Tester)',
+    roleOptions: ['Tester', 'Pengembang', 'Tamu'],
+    unregisteredLabel: 'Tamu (Testing)',
+    badgeClass: 'badge-accent badge-outline',
+    accentSolidClass: 'btn-primary text-primary-content',
   },
 };
 
 export function getWorkspaceMeta(workspace) {
-  return WORKSPACE_META[workspace === 'gereja' ? 'gereja' : 'piloting'];
+  if (workspace === 'gereja') return WORKSPACE_META.gereja;
+  if (workspace === 'testing') return WORKSPACE_META.testing;
+  return WORKSPACE_META.piloting;
 }
 
 export function formatWilayahLabel(wilayah) {
@@ -67,71 +82,24 @@ export function formatWilayahLabel(wilayah) {
   return /^wilayah\b/i.test(clean) ? clean : `Wilayah ${clean}`;
 }
 
-export function MardoniusRielMark({ workspace = 'portal', size = 40, className = '' }) {
-  const isChurch = workspace === 'gereja';
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 44 44"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className={`shrink-0 ${className}`}
-      aria-label="Monogram Mardonius Riel"
-    >
-      {/* Crisp architectural frame */}
-      <rect
-        x="1.5"
-        y="1.5"
-        width="41"
-        height="41"
-        rx="10"
-        className="fill-[#1C1917] stroke-[#B45309]/45 dark:fill-[#26221E] dark:stroke-amber-500/45"
-        strokeWidth="1.25"
-      />
-      <rect
-        x="4.5"
-        y="4.5"
-        width="35"
-        height="35"
-        rx="7.5"
-        className="stroke-[#FAF7F2]/15"
-        strokeWidth="0.75"
-      />
+export function WorkspaceIcon({ workspace = 'piloting', className = 'h-5 w-5' }) {
+  if (workspace === 'gereja') {
+    return <Church className={className} strokeWidth={1.75} />;
+  }
+  if (workspace === 'testing') {
+    return <ScanFace className={className} strokeWidth={1.75} />;
+  }
+  return <SlidersHorizontal className={className} strokeWidth={1.75} />;
+}
 
-      {isChurch ? (
-        /* Sanctuary arch + subtle cross beam motif for Gereja workspace */
-        <>
-          <path
-            d="M13 31V18C13 13.0294 17.0294 9 22 9C26.9706 9 31 13.0294 31 18V31"
-            stroke="#F5D0A9"
-            strokeWidth="1.75"
-            strokeLinecap="round"
-          />
-          <path d="M22 14V26.5M17.5 18.5H26.5" stroke="#FAF7F2" strokeWidth="1.8" strokeLinecap="round" />
-          <path d="M11 31H33" stroke="#D97706" strokeWidth="1.4" strokeLinecap="round" />
-        </>
-      ) : (
-        /* Signature M + R architectural monogram for Mardonius Riel */
-        <>
-          {/* M stem + chevron */}
-          <path
-            d="M11 30V14.5L17.5 23.5L24 14.5V30"
-            stroke="#FAF7F2"
-            strokeWidth="1.9"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          {/* R bowl + leg */}
-          <path
-            d="M27.5 30V14.5H31.8C33.8 14.5 35.2 15.8 35.2 17.7C35.2 19.6 33.8 20.9 31.8 20.9H27.5M31.2 20.9L35.3 30"
-            stroke="#F59E0B"
-            strokeWidth="1.9"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </>
-      )}
-    </svg>
+export function MardoniusRielMark({ workspace = 'portal', size = 36, className = '' }) {
+  return (
+    <div
+      style={{ width: size, height: size }}
+      className={`inline-flex shrink-0 items-center justify-center rounded-box border border-base-300 bg-base-200 text-primary ${className}`}
+      aria-label="Logo Presensi Wajah"
+    >
+      <WorkspaceIcon workspace={workspace} className="h-5 w-5" />
+    </div>
   );
 }

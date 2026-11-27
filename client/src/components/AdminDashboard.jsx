@@ -241,8 +241,8 @@ export default function AdminDashboard({ workspace = 'piloting', readOnly = fals
       </div>
 
       {errorMsg && (
-        <div className="rounded-xl border border-rose-300 bg-rose-50 p-3 text-xs text-rose-700 dark:border-rose-500/40 dark:bg-rose-950/50 dark:text-rose-300">
-          {errorMsg}
+        <div className="alert alert-error py-2.5 text-xs">
+          <span>{errorMsg}</span>
         </div>
       )}
 
@@ -273,11 +273,11 @@ export default function AdminDashboard({ workspace = 'piloting', readOnly = fals
           </div>
 
           {/* Users Container */}
-          <div className="overflow-hidden rounded-2xl border border-base-300 bg-base-100 shadow-sm">
+          <div className="overflow-hidden rounded-box border border-base-300 bg-base-100">
             {/* Mobile Cards (Zero horizontal scroll) */}
             <div className="divide-y divide-base-300 md:hidden">
               {users.length === 0 ? (
-                <div className="px-4 py-10 text-center text-xs text-stone-500">
+                <div className="px-4 py-10 text-center text-xs text-base-content/50">
                   Belum ada data pengguna terdaftar di MongoDB.
                 </div>
               ) : (
@@ -289,15 +289,15 @@ export default function AdminDashboard({ workspace = 'piloting', readOnly = fals
                           <img
                             src={u.photoBase64}
                             alt={u.name}
-                            className="h-11 w-11 shrink-0 rounded-xl object-cover ring-1 ring-stone-200 dark:ring-stone-700"
+                            className="h-11 w-11 shrink-0 rounded-box object-cover ring-1 ring-base-300"
                           />
                         ) : (
-                          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-stone-100 text-stone-500 dark:bg-stone-800 dark:text-stone-400">
+                          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-box bg-base-200 text-base-content/50">
                             <UserCheck className="h-5 w-5" />
                           </div>
                         )}
                         <div className="min-w-0">
-                          <div className="truncate text-sm font-bold text-base-content">
+                          <div className="truncate text-sm font-semibold text-base-content">
                             {u.name}
                           </div>
                           <div className="text-xs text-base-content/60">
@@ -309,18 +309,18 @@ export default function AdminDashboard({ workspace = 'piloting', readOnly = fals
                         type="button"
                         disabled={readOnly}
                         onClick={() => !readOnly && handleToggleActive(u)}
-                        className={`shrink-0 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-semibold transition ${
+                        className={`badge badge-sm shrink-0 whitespace-nowrap font-medium ${
                           u.isActive
-                            ? 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:ring-0'
-                            : 'bg-stone-100 text-stone-500 dark:bg-stone-800 dark:text-stone-400'
-                        } ${readOnly ? 'cursor-default opacity-80' : ''}`}
+                            ? 'badge-success badge-outline'
+                            : 'badge-ghost'
+                        } ${readOnly ? 'cursor-default opacity-80' : 'cursor-pointer'}`}
                       >
                         {u.isActive ? 'Aktif' : 'Nonaktif'}
                       </button>
                     </div>
 
                     <div className="flex items-center justify-between gap-2 pt-0.5">
-                      <span className="whitespace-nowrap rounded-lg bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-700 ring-1 ring-indigo-200 dark:bg-indigo-500/15 dark:text-indigo-300 dark:ring-0">
+                      <span className="badge badge-outline badge-sm whitespace-nowrap font-medium">
                         {u.descriptorCount || 1} descriptor
                       </span>
                       {!readOnly && (
@@ -328,7 +328,7 @@ export default function AdminDashboard({ workspace = 'piloting', readOnly = fals
                           <button
                             type="button"
                             onClick={() => openEditModal(u)}
-                            className="inline-flex items-center gap-1 rounded-lg bg-stone-100 px-2.5 py-1.5 text-xs font-semibold text-sky-700 hover:bg-stone-200 dark:bg-stone-800 dark:text-sky-400 dark:hover:bg-stone-700"
+                            className="btn btn-xs btn-ghost border border-base-300 gap-1"
                           >
                             <Edit3 className="h-3.5 w-3.5" />
                             Edit
@@ -336,7 +336,7 @@ export default function AdminDashboard({ workspace = 'piloting', readOnly = fals
                           <button
                             type="button"
                             onClick={() => handleDeleteUser(u)}
-                            className="inline-flex items-center gap-1 rounded-lg bg-rose-50 px-2.5 py-1.5 text-xs font-semibold text-rose-700 hover:bg-rose-100 dark:bg-stone-800 dark:text-rose-400 dark:hover:bg-rose-950/60"
+                            className="btn btn-xs btn-ghost border border-base-300 text-error gap-1"
                           >
                             <Trash2 className="h-3.5 w-3.5" />
                             Hapus
@@ -351,37 +351,37 @@ export default function AdminDashboard({ workspace = 'piloting', readOnly = fals
 
             {/* Desktop Table */}
             <div className="hidden overflow-x-auto md:block">
-              <table className="w-full text-left text-sm">
-                <thead className="border-b border-stone-200 bg-base-200 text-xs uppercase text-base-content/60 border-base-300">
+              <table className="table table-sm w-full">
+                <thead className="bg-base-200/70 text-xs uppercase text-base-content/60">
                   <tr>
-                    <th className="px-4 py-3">Wajah &amp; Nama</th>
-                    <th className="px-4 py-3">ID / NIM / NIP</th>
-                    <th className="px-4 py-3">Divisi / Peran</th>
-                    <th className="px-4 py-3">Sampel Wajah</th>
-                    <th className="px-4 py-3">Status</th>
-                    <th className="px-4 py-3 text-right">Aksi CRUD</th>
+                    <th>Wajah &amp; Nama</th>
+                    <th>ID / NIM / NIP</th>
+                    <th>Divisi / Peran</th>
+                    <th>Sampel Wajah</th>
+                    <th>Status</th>
+                    <th className="text-right">Aksi</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-base-300">
+                <tbody>
                   {users.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="px-4 py-10 text-center text-xs text-stone-500">
+                      <td colSpan={6} className="py-10 text-center text-xs text-base-content/50">
                         Belum ada data pengguna terdaftar di MongoDB.
                       </td>
                     </tr>
                   ) : (
                     users.map((u) => (
-                      <tr key={u._id} className="hover:bg-stone-50 dark:hover:bg-stone-800/30">
-                        <td className="px-4 py-3">
+                      <tr key={u._id} className="hover">
+                        <td>
                           <div className="flex items-center gap-3">
                             {u.photoBase64 ? (
                               <img
                                 src={u.photoBase64}
                                 alt={u.name}
-                                className="h-10 w-10 rounded-xl object-cover ring-1 ring-stone-200 dark:ring-stone-700"
+                                className="h-10 w-10 rounded-box object-cover ring-1 ring-base-300"
                               />
                             ) : (
-                              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-stone-100 text-stone-500 dark:bg-stone-800 dark:text-stone-400">
+                              <div className="flex h-10 w-10 items-center justify-center rounded-box bg-base-200 text-base-content/50">
                                 <UserCheck className="h-5 w-5" />
                               </div>
                             )}
@@ -389,7 +389,7 @@ export default function AdminDashboard({ workspace = 'piloting', readOnly = fals
                               <div className="font-semibold text-base-content">
                                 {u.name}
                               </div>
-                              <div className="text-[11px] text-stone-500">
+                              <div className="text-[11px] text-base-content/50">
                                 Daftar:{' '}
                                 {new Date(u.createdAt).toLocaleDateString('id-ID', {
                                   day: '2-digit',
@@ -400,54 +400,54 @@ export default function AdminDashboard({ workspace = 'piloting', readOnly = fals
                             </div>
                           </div>
                         </td>
-                        <td className="px-4 py-3 text-xs text-base-content/75">
+                        <td className="text-xs text-base-content/75">
                           {u.identifier || '-'}
                         </td>
-                        <td className="px-4 py-3 text-xs">
-                          <div className="text-stone-800 dark:text-stone-200">{u.department}</div>
-                          <div className="text-stone-500">
+                        <td className="text-xs">
+                          <div className="text-base-content">{u.department}</div>
+                          <div className="text-base-content/60">
                             {u.role}{u.wilayah ? ` • ${formatWilayahLabel(u.wilayah)}` : ''}
                           </div>
                         </td>
-                        <td className="px-4 py-3">
-                          <span className="whitespace-nowrap rounded-lg bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-700 ring-1 ring-indigo-200 dark:bg-indigo-500/15 dark:text-indigo-300 dark:ring-0">
+                        <td>
+                          <span className="badge badge-outline badge-sm whitespace-nowrap font-medium">
                             {u.descriptorCount || 1} descriptor
                           </span>
                         </td>
-                        <td className="px-4 py-3">
+                        <td>
                           <button
                             type="button"
                             disabled={readOnly}
                             onClick={() => !readOnly && handleToggleActive(u)}
-                            className={`whitespace-nowrap rounded border px-2 py-0.5 text-xs font-medium transition ${
+                            className={`badge badge-sm whitespace-nowrap font-medium ${
                               u.isActive
-                                ? 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 dark:border-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300'
-                                : 'border-base-300 bg-base-200 text-base-content/60 hover:bg-base-300'
-                            } ${readOnly ? 'cursor-default opacity-80' : ''}`}
+                                ? 'badge-success badge-outline'
+                                : 'badge-ghost'
+                            } ${readOnly ? 'cursor-default opacity-80' : 'cursor-pointer'}`}
                           >
                             {u.isActive ? 'Aktif' : 'Nonaktif'}
                           </button>
                         </td>
-                        <td className="px-4 py-3 text-right">
+                        <td className="text-right">
                           {readOnly ? (
                             <span className="text-[11px] opacity-50">Read-Only</span>
                           ) : (
-                            <div className="inline-flex items-center gap-1.5">
+                            <div className="inline-flex items-center gap-1">
                               <button
                                 type="button"
                                 onClick={() => openEditModal(u)}
-                                className="rounded-lg bg-stone-100 p-2 text-sky-600 hover:bg-stone-200 dark:bg-stone-800 dark:text-sky-400 dark:hover:bg-stone-700"
+                                className="btn btn-xs btn-ghost btn-square"
                                 title="Edit Data & Tambah Sampel Wajah"
                               >
-                                <Edit3 className="h-4 w-4" />
+                                <Edit3 className="h-3.5 w-3.5" />
                               </button>
                               <button
                                 type="button"
                                 onClick={() => handleDeleteUser(u)}
-                                className="rounded-lg bg-stone-100 p-2 text-rose-600 hover:bg-rose-50 dark:bg-stone-800 dark:text-rose-400 dark:hover:bg-rose-950/60"
+                                className="btn btn-xs btn-ghost btn-square text-error"
                                 title="Hapus dari MongoDB"
                               >
-                                <Trash2 className="h-4 w-4" />
+                                <Trash2 className="h-3.5 w-3.5" />
                               </button>
                             </div>
                           )}
@@ -462,11 +462,11 @@ export default function AdminDashboard({ workspace = 'piloting', readOnly = fals
         </div>
       ) : (
         /* Logs Management Tab */
-        <div className="overflow-hidden rounded-2xl border border-base-300 bg-base-100 shadow-sm">
+        <div className="overflow-hidden rounded-box border border-base-300 bg-base-100">
           {/* Mobile Log Cards (Zero horizontal scroll) */}
           <div className="divide-y divide-base-300 md:hidden">
             {logs.length === 0 ? (
-              <div className="px-4 py-10 text-center text-xs text-stone-500">
+              <div className="px-4 py-10 text-center text-xs text-base-content/50">
                 Belum ada log masuk tercatat.
               </div>
             ) : (
@@ -476,10 +476,10 @@ export default function AdminDashboard({ workspace = 'piloting', readOnly = fals
                     <img
                       src={log.snapshotBase64}
                       alt={log.personName}
-                      className="h-10 w-10 shrink-0 rounded-xl object-cover"
+                      className="h-10 w-10 shrink-0 rounded-box object-cover"
                     />
                   ) : (
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-stone-100 text-stone-500 dark:bg-stone-800 dark:text-stone-400">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-box bg-base-200 text-base-content/50">
                       {log.status === 'REGISTERED' ? (
                         <UserCheck className="h-4 w-4" />
                       ) : (
@@ -489,7 +489,7 @@ export default function AdminDashboard({ workspace = 'piloting', readOnly = fals
                   )}
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between gap-2">
-                      <div className="truncate text-sm font-bold text-base-content">
+                      <div className="truncate text-sm font-semibold text-base-content">
                         {log.personName}
                       </div>
                       {!readOnly && (
@@ -497,7 +497,7 @@ export default function AdminDashboard({ workspace = 'piloting', readOnly = fals
                           <button
                             type="button"
                             onClick={() => setLogModalState({ open: true, mode: 'edit', initialLog: log })}
-                            className="rounded border border-base-300 bg-base-100 p-1.5 text-sky-600 hover:bg-base-200 dark:text-sky-400"
+                            className="btn btn-xs btn-ghost btn-square"
                             title="Edit Log"
                           >
                             <Edit3 className="h-3.5 w-3.5" />
@@ -505,7 +505,7 @@ export default function AdminDashboard({ workspace = 'piloting', readOnly = fals
                           <button
                             type="button"
                             onClick={() => handleDeleteLog(log)}
-                            className="rounded border border-base-300 bg-base-100 p-1.5 text-rose-600 hover:bg-rose-50 dark:text-rose-400"
+                            className="btn btn-xs btn-ghost btn-square text-error"
                             title="Hapus Log"
                           >
                             <Trash2 className="h-3.5 w-3.5" />
@@ -518,16 +518,16 @@ export default function AdminDashboard({ workspace = 'piloting', readOnly = fals
                     </div>
                     <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
                       <span
-                        className={`whitespace-nowrap rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+                        className={`badge badge-sm whitespace-nowrap font-medium ${
                           log.status === 'REGISTERED'
-                            ? 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:ring-0'
-                            : 'bg-amber-50 text-amber-700 ring-1 ring-amber-200 dark:bg-amber-500/15 dark:text-amber-300 dark:ring-0'
+                            ? 'badge-success badge-outline'
+                            : 'badge-warning badge-outline'
                         }`}
                       >
                         {log.status === 'REGISTERED' ? 'Terdaftar' : 'Bablas'}
                       </span>
                       {log.status === 'REGISTERED' && (
-                        <span className="text-[11px] font-medium text-sky-600 dark:text-sky-300">
+                        <span className="text-[11px] font-medium text-base-content/70">
                           Kemiripan: {log.confidence}%
                         </span>
                       )}
@@ -545,40 +545,40 @@ export default function AdminDashboard({ workspace = 'piloting', readOnly = fals
 
           {/* Desktop Log Table */}
           <div className="hidden overflow-x-auto md:block">
-            <table className="w-full text-left text-sm">
-              <thead className="border-b border-stone-200 bg-base-200 text-xs uppercase text-base-content/60 border-base-300">
+            <table className="table table-sm w-full">
+              <thead className="bg-base-200/70 text-xs uppercase text-base-content/60">
                 <tr>
-                  <th className="px-4 py-3">Waktu</th>
-                  <th className="px-4 py-3">Foto &amp; Nama</th>
-                  <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3">Kemiripan</th>
-                  <th className="px-4 py-3">Catatan</th>
-                  <th className="px-4 py-3 text-right">Aksi</th>
+                  <th>Waktu</th>
+                  <th>Foto &amp; Nama</th>
+                  <th>Status</th>
+                  <th>Kemiripan</th>
+                  <th>Catatan</th>
+                  <th className="text-right">Aksi</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-base-300">
+              <tbody>
                 {logs.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-4 py-10 text-center text-xs text-stone-500">
+                    <td colSpan={6} className="py-10 text-center text-xs text-base-content/50">
                       Belum ada log masuk tercatat.
                     </td>
                   </tr>
                 ) : (
                   logs.map((log) => (
-                    <tr key={log._id} className="hover:bg-stone-50 dark:hover:bg-stone-800/30">
-                      <td className="whitespace-nowrap px-4 py-3 text-xs text-base-content/75">
+                    <tr key={log._id} className="hover">
+                      <td className="whitespace-nowrap text-xs text-base-content/75">
                         {new Date(log.enteredAt).toLocaleString('id-ID')}
                       </td>
-                      <td className="px-4 py-3">
+                      <td>
                         <div className="flex items-center gap-2.5">
                           {log.snapshotBase64 ? (
                             <img
                               src={log.snapshotBase64}
                               alt={log.personName}
-                              className="h-9 w-9 rounded-lg object-cover"
+                              className="h-9 w-9 rounded-box object-cover"
                             />
                           ) : (
-                            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-stone-100 text-stone-500 dark:bg-stone-800 dark:text-stone-400">
+                            <div className="flex h-9 w-9 items-center justify-center rounded-box bg-base-200 text-base-content/50">
                               {log.status === 'REGISTERED' ? (
                                 <UserCheck className="h-4 w-4" />
                               ) : (
@@ -590,28 +590,28 @@ export default function AdminDashboard({ workspace = 'piloting', readOnly = fals
                             <div className="text-xs font-semibold text-base-content">
                               {log.personName}
                             </div>
-                            <div className="text-[11px] text-stone-500">{log.department}</div>
+                            <div className="text-[11px] text-base-content/60">{log.department}</div>
                           </div>
                         </div>
                       </td>
-                      <td className="px-4 py-3">
+                      <td>
                         <span
-                          className={`whitespace-nowrap rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${
+                          className={`badge badge-sm whitespace-nowrap font-medium ${
                             log.status === 'REGISTERED'
-                              ? 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:ring-0'
-                              : 'bg-amber-50 text-amber-700 ring-1 ring-amber-200 dark:bg-amber-500/15 dark:text-amber-300 dark:ring-0'
+                              ? 'badge-success badge-outline'
+                              : 'badge-warning badge-outline'
                           }`}
                         >
                           {log.status === 'REGISTERED' ? 'Terdaftar' : 'Tidak Terdaftar (Bablas)'}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-xs text-base-content/75">
+                      <td className="text-xs text-base-content/75">
                         {log.status === 'REGISTERED' ? `${log.confidence}%` : '-'}
                       </td>
-                      <td className="max-w-xs truncate px-4 py-3 text-xs text-base-content/60">
+                      <td className="max-w-xs truncate text-xs text-base-content/60">
                         {log.notes}
                       </td>
-                      <td className="px-4 py-3 text-right">
+                      <td className="text-right">
                         {readOnly ? (
                           <span className="text-[11px] opacity-50">Read-Only</span>
                         ) : (
@@ -619,7 +619,7 @@ export default function AdminDashboard({ workspace = 'piloting', readOnly = fals
                             <button
                               type="button"
                               onClick={() => setLogModalState({ open: true, mode: 'edit', initialLog: log })}
-                              className="rounded border border-base-300 bg-base-100 p-1.5 text-sky-600 hover:bg-base-200 dark:text-sky-400"
+                              className="btn btn-xs btn-ghost btn-square"
                               title="Edit Log"
                             >
                               <Edit3 className="h-3.5 w-3.5" />
@@ -627,7 +627,7 @@ export default function AdminDashboard({ workspace = 'piloting', readOnly = fals
                             <button
                               type="button"
                               onClick={() => handleDeleteLog(log)}
-                              className="rounded border border-base-300 bg-base-100 p-1.5 text-rose-600 hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-rose-950/60"
+                              className="btn btn-xs btn-ghost btn-square text-error"
                               title="Hapus Log"
                             >
                               <Trash2 className="h-3.5 w-3.5" />
@@ -646,18 +646,18 @@ export default function AdminDashboard({ workspace = 'piloting', readOnly = fals
 
       {/* Edit User Modal */}
       {editingUser && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-900/50 p-4 backdrop-blur-sm dark:bg-stone-950/80">
-          <div className="w-full max-w-md rounded-2xl border border-stone-200 bg-white p-5 shadow-2xl dark:border-stone-800 dark:bg-stone-900">
-            <div className="flex items-center justify-between border-b border-stone-200 pb-3 dark:border-stone-800">
-              <h3 className="text-base font-bold text-base-content">
+        <div className="modal modal-open z-50">
+          <div className="modal-box max-w-md border border-base-300 bg-base-100 p-5">
+            <div className="flex items-center justify-between border-b border-base-300 pb-3">
+              <h3 className="text-sm font-semibold text-base-content">
                 Edit Data Pengguna
               </h3>
               <button
                 type="button"
                 onClick={() => setEditingUser(null)}
-                className="rounded-lg p-1 text-stone-500 hover:bg-stone-100 hover:text-stone-900 dark:text-stone-400 dark:hover:bg-stone-800 dark:hover:text-white"
+                className="btn btn-ghost btn-xs btn-square"
               >
-                <X className="h-5 w-5" />
+                <X className="h-4 w-4" />
               </button>
             </div>
 
@@ -671,7 +671,7 @@ export default function AdminDashboard({ workspace = 'piloting', readOnly = fals
                   required
                   value={editForm.name}
                   onChange={(e) => setEditForm((f) => ({ ...f, name: e.target.value }))}
-                  className="w-full rounded-xl border border-stone-300 bg-stone-50 px-3 py-2 text-sm text-stone-900 focus:border-[#7C2D12] focus:outline-none dark:border-stone-700 dark:bg-stone-950 dark:text-white"
+                  className="input input-bordered input-sm w-full"
                 />
               </div>
 
@@ -684,7 +684,7 @@ export default function AdminDashboard({ workspace = 'piloting', readOnly = fals
                     type="text"
                     value={editForm.identifier}
                     onChange={(e) => setEditForm((f) => ({ ...f, identifier: e.target.value }))}
-                    className="w-full rounded-xl border border-stone-300 bg-stone-50 px-3 py-2 text-sm text-stone-900 focus:border-[#7C2D12] focus:outline-none dark:border-stone-700 dark:bg-stone-950 dark:text-white"
+                    className="input input-bordered input-sm w-full"
                   />
                 </div>
                 <div>
@@ -695,7 +695,7 @@ export default function AdminDashboard({ workspace = 'piloting', readOnly = fals
                     type="text"
                     value={editForm.department}
                     onChange={(e) => setEditForm((f) => ({ ...f, department: e.target.value }))}
-                    className="w-full rounded-xl border border-stone-300 bg-stone-50 px-3 py-2 text-sm text-stone-900 focus:border-[#7C2D12] focus:outline-none dark:border-stone-700 dark:bg-stone-950 dark:text-white"
+                    className="input input-bordered input-sm w-full"
                   />
                 </div>
               </div>
@@ -710,7 +710,7 @@ export default function AdminDashboard({ workspace = 'piloting', readOnly = fals
                     value={editForm.wilayah}
                     onChange={(e) => setEditForm((f) => ({ ...f, wilayah: e.target.value }))}
                     placeholder="Mis: Wilayah 1"
-                    className="w-full rounded-xl border border-stone-300 bg-stone-50 px-3 py-2 text-sm text-stone-900 focus:border-[#7C2D12] focus:outline-none dark:border-stone-700 dark:bg-stone-950 dark:text-white"
+                    className="input input-bordered input-sm w-full"
                   />
                 </div>
                 <div>
@@ -720,7 +720,7 @@ export default function AdminDashboard({ workspace = 'piloting', readOnly = fals
                   <select
                     value={editForm.role}
                     onChange={(e) => setEditForm((f) => ({ ...f, role: e.target.value }))}
-                    className="select select-bordered select-sm w-full bg-base-100 text-sm text-base-content"
+                    className="select select-bordered select-sm w-full"
                   >
                     {Array.from(new Set([...roleOptions, editForm.role].filter(Boolean))).map((opt) => (
                       <option key={opt} value={opt}>
@@ -730,29 +730,29 @@ export default function AdminDashboard({ workspace = 'piloting', readOnly = fals
                   </select>
                 </div>
                 <div className="flex items-end pb-1">
-                  <label className="flex items-center gap-2 text-xs font-medium text-stone-700 dark:text-stone-200">
+                  <label className="flex cursor-pointer items-center gap-2 text-xs font-medium text-base-content">
                     <input
                       type="checkbox"
                       checked={editForm.isActive}
                       onChange={(e) => setEditForm((f) => ({ ...f, isActive: e.target.checked }))}
-                      className="h-4 w-4 accent-emerald-600 dark:accent-emerald-500"
+                      className="checkbox checkbox-sm checkbox-primary"
                     />
                     Status Aktif
                   </label>
                 </div>
               </div>
 
-              <div className="rounded-xl border border-stone-200 bg-stone-50 p-3 dark:border-stone-800 dark:bg-[#141210]/70">
+              <div className="rounded-box border border-base-300 bg-base-200/50 p-3">
                 <div className="flex items-center justify-between gap-2">
                   <div>
-                    <div className="text-xs font-semibold text-stone-800 dark:text-stone-200">
+                    <div className="text-xs font-semibold text-base-content">
                       Tambah Sampel Wajah (Opsional)
                     </div>
                     <div className="text-[11px] text-base-content/60">
                       Tambahkan foto sudut lain agar akurasi makin tinggi.
                     </div>
                   </div>
-                  <label className="inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg bg-stone-200 px-2.5 py-1.5 text-xs font-medium text-sky-700 hover:bg-stone-300 dark:bg-stone-800 dark:text-sky-300 dark:hover:bg-stone-700">
+                  <label className="btn btn-xs btn-ghost border border-base-300 shrink-0 gap-1.5">
                     <ImagePlus className="h-3.5 w-3.5" />
                     Pilih Foto
                     <input
@@ -764,7 +764,7 @@ export default function AdminDashboard({ workspace = 'piloting', readOnly = fals
                   </label>
                 </div>
                 {extraFaceMsg && (
-                  <p className="mt-2 text-[11px] font-medium text-emerald-700 dark:text-emerald-300">
+                  <p className="mt-2 text-[11px] font-medium text-success">
                     {extraFaceMsg}
                   </p>
                 )}
@@ -774,14 +774,14 @@ export default function AdminDashboard({ workspace = 'piloting', readOnly = fals
                 <button
                   type="button"
                   onClick={() => setEditingUser(null)}
-                  className="rounded-xl bg-stone-100 px-4 py-2 text-xs font-semibold text-stone-700 hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-300 dark:hover:bg-stone-700"
+                  className="btn btn-sm btn-ghost border border-base-300"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={savingEdit}
-                  className={`inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-bold disabled:opacity-50 ${wsMeta.accentSolidClass}`}
+                  className={`btn btn-sm gap-1.5 ${wsMeta.accentSolidClass}`}
                 >
                   <Check className="h-4 w-4" />
                   {savingEdit ? 'Menyimpan...' : 'Simpan Perubahan'}

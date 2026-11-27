@@ -8,9 +8,9 @@ import { normalizeWorkspace, workspaceQueryFilter } from '../utils/workspace.js'
 const router = express.Router();
 
 function getWorkspacePdfLabel(workspace) {
-  return workspace === 'gereja'
-    ? 'GEREJA — KEHADIRAN JEMAAT & PELAYAN'
-    : 'PILOTING — PRESENSI & COUNTING';
+  if (workspace === 'gereja') return 'GEREJA — KEHADIRAN JEMAAT & PELAYAN';
+  if (workspace === 'testing') return 'TESTING — DATA UJI KAMERA';
+  return 'PILOTING — PRESENSI & COUNTING';
 }
 
 async function buildDailySummary(dateKey, workspace = 'piloting') {
