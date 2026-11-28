@@ -47,47 +47,47 @@ export default function AdminLogin({ targetLabel = 'Panel Admin', onBackToPortal
       <main className="flex flex-1 items-center justify-center px-4 py-8">
         <div className="card w-full max-w-sm border border-base-300 bg-base-100">
           <div className="card-body p-6 gap-4">
-            <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-box bg-base-200 text-primary border border-base-300">
-                <Lock className="h-4 w-4" />
+            <div className="flex items-center gap-3.5">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-primary">
+                <Lock className="h-5 w-5" />
               </div>
               <div>
-                <h1 className="text-base font-semibold text-base-content">Masuk Admin</h1>
-                <p className="text-xs text-base-content/65">
+                <h1 className="text-lg font-bold text-base-content">Masuk Admin</h1>
+                <p className="text-sm text-base-content/75">
                   Silakan login untuk mengelola data.
                 </p>
               </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-3">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <label className="form-control">
-                <span className="label-text mb-1 text-xs font-medium">Username</span>
+                <span className="label-text mb-1.5 text-sm font-semibold">Username</span>
                 <input
                   type="text"
                   required
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="admin"
-                  className="input input-bordered input-sm w-full"
+                  className="input input-bordered h-11 w-full text-sm"
                   autoComplete="username"
                 />
               </label>
 
               <label className="form-control">
-                <span className="label-text mb-1 text-xs font-medium">Password</span>
+                <span className="label-text mb-1.5 text-sm font-semibold">Password</span>
                 <input
                   type="password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Masukkan password"
-                  className="input input-bordered input-sm w-full"
+                  className="input input-bordered h-11 w-full text-sm"
                   autoComplete="current-password"
                 />
               </label>
 
               {error && (
-                <div className="alert alert-error py-2 text-xs">
+                <div className="alert alert-error is-error py-2.5 text-sm font-medium text-error-content">
                   <span>{error}</span>
                 </div>
               )}
@@ -95,9 +95,13 @@ export default function AdminLogin({ targetLabel = 'Panel Admin', onBackToPortal
               <button
                 type="submit"
                 disabled={loading}
-                className="btn btn-primary btn-sm w-full h-10 sm:h-9 gap-1.5"
+                className="btn btn-primary w-full h-11 min-h-11 gap-2 text-sm font-semibold"
               >
-                <LogIn className="h-3.5 w-3.5" />
+                {loading ? (
+                  <span className="spinner !border-white/30 !border-t-white" aria-hidden="true" />
+                ) : (
+                  <LogIn className="h-4 w-4" />
+                )}
                 <span>{loading ? 'Memeriksa...' : 'Masuk'}</span>
               </button>
             </form>

@@ -184,8 +184,9 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => navigateTo('/')}
-                className="btn btn-sm btn-square btn-ghost border border-base-300 shrink-0"
+                className="icon-button btn btn-sm btn-square btn-ghost border border-base-300 shrink-0"
                 title="Kembali"
+                aria-label="Kembali ke beranda"
               >
                 <ArrowLeft className="h-4 w-4" />
               </button>
@@ -248,7 +249,7 @@ export default function App() {
   if (checkingAuth) {
     return (
       <div className="min-h-screen bg-base-200 flex items-center justify-center">
-        <span className="loading loading-spinner loading-lg text-primary" />
+        <div className="spinner !h-8 !w-8" role="status" aria-label="Memuat" />
       </div>
     );
   }
@@ -275,9 +276,9 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => navigateTo('/')}
-                className="btn btn-sm btn-square btn-ghost border border-base-300 shrink-0"
+                className="icon-button btn btn-sm btn-square btn-ghost border border-base-300 shrink-0"
                 title="Kembali"
-                aria-label="Kembali"
+                aria-label="Kembali ke beranda"
               >
                 <ArrowLeft className="h-4 w-4" />
               </button>
@@ -342,8 +343,9 @@ export default function App() {
             {actualRole === 'admin' && (
               <button
                 type="button"
+                aria-pressed={previewReadOnly}
                 onClick={() => setPreviewReadOnly((v) => !v)}
-                className={`btn btn-sm font-normal gap-1.5 shrink-0 whitespace-nowrap ${
+                className={`icon-button btn btn-sm font-medium gap-1.5 shrink-0 whitespace-nowrap ${
                   previewReadOnly
                     ? 'btn-warning'
                     : 'btn-ghost border border-base-300'
