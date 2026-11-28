@@ -548,12 +548,12 @@ export default function ReportsSummary({ workspace = 'piloting', readOnly = fals
                     <span>Tgl: {m.date}</span>
                     {m.sessionLabel && (
                       <span className="badge badge-xs badge-outline">
-                        {m.sessionLabel}
+                        {m.sessionLabel}{m.sessionTime ? ` · ${m.sessionTime}` : ''}
                       </span>
                     )}
                     {m.firstEntry && (
                       <span>
-                        • Jam: <strong className="text-base-content">{new Date(m.firstEntry).toLocaleTimeString('id-ID')}</strong>
+                        • Masuk: <strong className="text-base-content">{new Date(m.firstEntry).toLocaleTimeString('id-ID')}</strong>
                       </span>
                     )}
                     {m.confidence !== null && (
@@ -1014,7 +1014,7 @@ export default function ReportsSummary({ workspace = 'piloting', readOnly = fals
                       </span>
                       {log.sessionLabel && (
                         <span className="badge badge-xs badge-outline">
-                          {log.sessionLabel}
+                          {log.sessionLabel}{log.sessionTime ? ` · ${log.sessionTime}` : ''}
                         </span>
                       )}
                       {log.status === 'REGISTERED' && (

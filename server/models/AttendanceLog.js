@@ -33,6 +33,11 @@ const attendanceLogSchema = new mongoose.Schema(
       default: '',
       trim: true,
     },
+    sessionTime: {
+      type: String,
+      default: '',
+      trim: true,
+    },
     status: {
       type: String,
       enum: ['REGISTERED', 'UNREGISTERED'],

@@ -8,19 +8,28 @@ import { rejectReadOnlyViewer } from '../utils/authToken.js';
 const router = express.Router();
 
 /**
- * Resolve dateKey, enteredAt Date, and sessionLabel ("Gereja Pagi" / "Gereja Sore")
- * from optional custom date (YYYY-MM-DD) and sessionTime (HH:mm).
+ * Resolve dateKey, real enteredAt Date, sessionTime (HH:mm), and sessionLabel ("Gereja Pagi" / "Gereja Sore").
+ * For live face scans (useSessionTimeAsEnteredAt = false), enteredAt ALWAYS stays the real current clock
+ * so we know the exact time the person arrived AND which worship schedule (dateKey + sessionTime) they attended.
  */
-function resolveLogTimestamp(dateStr, sessionTimeStr, fallbackDate = new Date()) {
+function resolveLogTimestamp(
+  dateStr,
+  sessionTimeStr,
+  fallbackDate = new Date(),
+  { useSessionTimeAsEnteredAt = false } = {}
+) {
   const base = fallbackDate instanceof Date ? fallbackDate : new Date(fallbackDate);
   const validDate = typeof dateStr === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateStr.trim());
   const validTime =
     typeof sessionTimeStr === 'string' && /^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/.test(sessionTimeStr.trim());
 
   const dateKey = validDate ? dateStr.trim() : toLocalDateKey(base);
-  let enteredAt = base;
+  const normalizedSessionTime = validTime
+    ? sessionTimeStr.trim().slice(0, 5)
+    : `${String(base.getHours()).padStart(2, '0')}:${String(base.getMinutes()).padStart(2, '0')}`;
 
-  if (validDate || validTime) {
+  let enteredAt = base;
+  if (useSessionTimeAsEnteredAt && (validDate || validTime)) {
     const [y, m, d] = dateKey.split('-').map(Number);
     let hh = base.getHours();
     let mm = base.getMinutes();
@@ -35,7 +44,8 @@ function resolveLogTimestamp(dateStr, sessionTimeStr, fallbackDate = new Date())
   return {
     dateKey,
     enteredAt,
-    sessionLabel: getChurchSessionLabel(enteredAt),
+    sessionTime: normalizedSessionTime,
+    sessionLabel: getChurchSessionLabel(normalizedSessionTime),
   };
 }
 
@@ -128,6 +138,7 @@ router.post('/', async (req, res) => {
       cooldownSeconds = 0,
       date = '',
       sessionTime = '',
+      manualEntry = false,
       oncePerDay = true,
     } = req.body;
 
@@ -136,7 +147,14 @@ router.post('/', async (req, res) => {
     }
 
     const now = new Date();
-    const { dateKey, enteredAt, sessionLabel } = resolveLogTimestamp(date, sessionTime, now);
+    const {
+      dateKey,
+      enteredAt,
+      sessionTime: resolvedSessionTime,
+      sessionLabel,
+    } = resolveLogTimestamp(date, sessionTime, now, {
+      useSessionTimeAsEnteredAt: Boolean(manualEntry),
+    });
 
     let resolvedName = personName;
     let resolvedIdentifier = identifier;
@@ -166,14 +184,23 @@ router.post('/', async (req, res) => {
       resolvedWilayah = user.wilayah || resolvedWilayah;
       resolvedWorkspace = normalizeWorkspace(user.workspace || workspace);
 
-      // Prevent duplicate/overwriting attendance for the same user on the same dateKey + sessionLabel
+      // Prevent duplicate/overwriting attendance for the same user on the same dateKey + worship sessionTime
       if (oncePerDay !== false) {
-        const existingToday = await AttendanceLog.findOne({
+        const dupQuery = {
           userId: user._id,
           status: 'REGISTERED',
           dateKey,
-          sessionLabel,
-        })
+          ...(resolvedSessionTime
+            ? {
+                $or: [
+                  { sessionTime: resolvedSessionTime },
+                  { sessionTime: { $in: ['', null] }, sessionLabel },
+                  { sessionTime: { $exists: false }, sessionLabel },
+                ],
+              }
+            : { sessionLabel }),
+        };
+        const existingToday = await AttendanceLog.findOne(dupQuery)
           .sort({ enteredAt: 1 })
           .lean();
 
@@ -183,7 +210,7 @@ router.post('/', async (req, res) => {
             skipped: true,
             alreadyCheckedIn: true,
             firstEntryAt: existingToday.enteredAt,
-            reason: `${user.name} sudah presensi pada ${dateKey} jam ${jamStr}`,
+            reason: `${user.name} sudah presensi (${existingToday.sessionLabel || sessionLabel}${existingToday.sessionTime ? ` ${existingToday.sessionTime}` : ''}) • Masuk jam ${jamStr}`,
             log: existingToday,
           });
         }
@@ -220,6 +247,7 @@ router.post('/', async (req, res) => {
       department: resolvedDepartment,
       wilayah: resolvedWilayah,
       sessionLabel,
+      sessionTime: resolvedSessionTime,
       workspace: resolvedWorkspace,
       status,
       eventType: eventType || (status === 'REGISTERED' ? 'ENTRY' : 'PASS_THROUGH'),
@@ -298,13 +326,17 @@ router.put('/:id', rejectReadOnlyViewer, async (req, res) => {
     }
 
     if (date || sessionTime) {
-      const { dateKey, enteredAt, sessionLabel } = resolveLogTimestamp(
-        date || log.dateKey,
-        sessionTime,
-        log.enteredAt || new Date()
-      );
+      const {
+        dateKey,
+        enteredAt,
+        sessionTime: resolvedSessionTime,
+        sessionLabel,
+      } = resolveLogTimestamp(date || log.dateKey, sessionTime, log.enteredAt || new Date(), {
+        useSessionTimeAsEnteredAt: true,
+      });
       log.dateKey = dateKey;
       log.enteredAt = enteredAt;
+      log.sessionTime = resolvedSessionTime;
       log.sessionLabel = sessionLabel;
     }
 

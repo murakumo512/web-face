@@ -2,7 +2,14 @@ import express from 'express';
 import PDFDocument from 'pdfkit';
 import { AttendanceLog } from '../models/AttendanceLog.js';
 import { User } from '../models/User.js';
-import { escapeCsvCell, formatDateTimeID, getChurchSessionLabel, toLocalDateKey } from '../utils/dateUtils.js';
+import {
+  escapeCsvCell,
+  formatDateLongID,
+  formatDateSlashID,
+  formatDateTimeID,
+  getChurchSessionLabel,
+  toLocalDateKey,
+} from '../utils/dateUtils.js';
 import { normalizeWorkspace, workspaceQueryFilter } from '../utils/workspace.js';
 
 const router = express.Router();
@@ -41,7 +48,8 @@ async function buildDailySummary(dateKey, workspace = 'piloting') {
     const dt = new Date(log.enteredAt);
     const hourIdx = dt.getHours();
     const bucket = hourly[hourIdx];
-    const logSession = log.sessionLabel || getChurchSessionLabel(dt);
+    const logSession = log.sessionLabel || getChurchSessionLabel(log.sessionTime || dt);
+    const logSessionTime = log.sessionTime || '';
     if (logSession === 'Gereja Pagi') morningCount += 1;
     else eveningCount += 1;
 
@@ -63,6 +71,7 @@ async function buildDailySummary(dateKey, workspace = 'piloting') {
           department: log.department || '-',
           wilayah: log.wilayah || '',
           sessionLabel: logSession,
+          sessionTime: logSessionTime,
           entryCount: 0,
           firstEntry: log.enteredAt,
           lastEntry: log.enteredAt,
@@ -108,6 +117,7 @@ async function buildDailySummary(dateKey, workspace = 'piloting') {
       present: Boolean(entry),
       attendanceStatus: entry ? 'Hadir' : 'Tidak Hadir',
       sessionLabel: entry ? entry.sessionLabel : '',
+      sessionTime: entry ? entry.sessionTime : '',
       firstEntry: entry ? entry.firstEntry : null,
       confidence: entry && entry.entryCount > 0 ? Math.round(entry.confidenceSum / entry.entryCount) : null,
     };
@@ -175,11 +185,16 @@ router.get('/export-csv', async (req, res) => {
       lines.push('');
       lines.push(['REKAP KEHADIRAN DAFTAR ANGGOTA', dateKey].map(escapeCsvCell).join(','));
       lines.push(
-        ['No', 'Nama', 'ID / NIM / NIP', 'Divisi / Bagian', 'Wilayah', 'Tanggal Absen', 'Kehadiran', 'Sesi Waktu', 'Jam Masuk', 'Kemiripan (%)']
+        ['No', 'Nama', 'ID / NIM / NIP', 'Divisi / Bagian', 'Wilayah', 'Tanggal Ibadah', 'Kehadiran', 'Sesi & Jadwal Ibadah', 'Waktu Masuk Aktual', 'Kemiripan (%)']
           .map(escapeCsvCell)
           .join(',')
       );
       summary.memberAttendance.forEach((m, idx) => {
+        const jadwalStr = m.sessionLabel
+          ? m.sessionTime
+            ? `${m.sessionLabel} (${m.sessionTime})`
+            : m.sessionLabel
+          : '-';
         lines.push(
           [
             idx + 1,
@@ -187,10 +202,10 @@ router.get('/export-csv', async (req, res) => {
             m.identifier,
             m.department,
             m.wilayah || '-',
-            m.date,
+            formatDateSlashID(m.date),
             m.attendanceStatus,
-            m.sessionLabel || '-',
-            m.firstEntry ? formatDateTimeID(m.firstEntry).slice(11) : '-',
+            jadwalStr,
+            m.firstEntry ? formatDateTimeID(m.firstEntry) : '-',
             m.confidence !== null ? m.confidence : '-',
           ]
             .map(escapeCsvCell)
@@ -205,7 +220,7 @@ router.get('/export-csv', async (req, res) => {
             '-',
             'Tamu / Belum Regis',
             '-',
-            dateKey,
+            formatDateSlashID(dateKey),
             `Bablas (${summary.unregisteredCount}x)`,
             '-',
             '-',
@@ -217,20 +232,23 @@ router.get('/export-csv', async (req, res) => {
       }
     } else {
       lines.push(
-        ['No', 'Tanggal & Waktu', 'Nama', 'ID / NIM / NIP', 'Divisi / Bagian', 'Status', 'Tipe Event', 'Kemiripan (%)', 'Catatan']
+        ['No', 'Waktu Masuk Aktual', 'Tanggal Ibadah', 'Sesi & Jadwal Ibadah', 'Nama', 'ID / NIM / NIP', 'Divisi / Bagian', 'Status', 'Kemiripan (%)', 'Catatan']
           .map(escapeCsvCell)
           .join(',')
       );
       summary.logs.forEach((log, idx) => {
+        const logSession = log.sessionLabel || getChurchSessionLabel(log.sessionTime || log.enteredAt);
+        const jadwalStr = log.sessionTime ? `${logSession} (${log.sessionTime})` : logSession;
         lines.push(
           [
             idx + 1,
             formatDateTimeID(log.enteredAt),
+            formatDateSlashID(log.dateKey || dateKey),
+            jadwalStr,
             log.personName,
             log.identifier || '-',
             log.department || '-',
             log.status === 'REGISTERED' ? 'Terdaftar' : 'Tidak Terdaftar (Bablas)',
-            log.eventType === 'ENTRY' ? 'Presensi Masuk' : 'Lewat Tanpa Regis',
             log.status === 'REGISTERED' ? log.confidence : '-',
             log.notes || '',
           ]
@@ -252,20 +270,27 @@ router.get('/export-csv', async (req, res) => {
 });
 
 function drawPdfTable(doc, { headers, colWidths, rows, startX = 40, rowHeight = 20 }) {
-  const pageBottom = doc.page.height - 45;
+  const pageBottom = doc.page.height - 52;
+  const totalW = colWidths.reduce((a, b) => a + b, 0);
   let y = doc.y;
+
+  // Prevent orphaned table header at the bottom of a page
+  if (y + rowHeight * 2 > pageBottom) {
+    doc.addPage();
+    y = 40;
+  }
 
   const drawHeader = () => {
     doc.save();
-    doc.rect(startX, y, colWidths.reduce((a, b) => a + b, 0), rowHeight).fill('#0f172a');
-    doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(8.5);
+    doc.rect(startX, y, totalW, rowHeight + 2).fill('#1e293b');
+    doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(8);
     let x = startX;
     headers.forEach((h, idx) => {
       doc.text(h, x + 5, y + 6, { width: colWidths[idx] - 10, ellipsis: true, lineBreak: false });
       x += colWidths[idx];
     });
     doc.restore();
-    y += rowHeight;
+    y += rowHeight + 2;
   };
 
   drawHeader();
@@ -276,11 +301,10 @@ function drawPdfTable(doc, { headers, colWidths, rows, startX = 40, rowHeight = 
       y = 40;
       drawHeader();
     }
-    const totalW = colWidths.reduce((a, b) => a + b, 0);
     doc.save();
     doc.rect(startX, y, totalW, rowHeight).fill(rIdx % 2 === 0 ? '#f8fafc' : '#ffffff');
     doc.strokeColor('#e2e8f0').lineWidth(0.5).rect(startX, y, totalW, rowHeight).stroke();
-    doc.fillColor('#0f172a').font('Helvetica').fontSize(8);
+    doc.fillColor('#0f172a').font('Helvetica').fontSize(7.8);
     let x = startX;
     row.forEach((cell, idx) => {
       doc.text(String(cell ?? ''), x + 5, y + 6, {
@@ -294,15 +318,35 @@ function drawPdfTable(doc, { headers, colWidths, rows, startX = 40, rowHeight = 
     y += rowHeight;
   });
 
-  doc.y = y + 12;
+  doc.y = y + 14;
 }
 
-// GET /api/summary/export-pdf?date=YYYY-MM-DD&mode=logs|summary|all&workspace=piloting|gereja
+function addPdfFooters(doc, leftText) {
+  const range = doc.bufferedPageRange();
+  for (let i = 0; i < range.count; i += 1) {
+    doc.switchToPage(range.start + i);
+    const footerY = doc.page.height - 30;
+    const pageW = doc.page.width - 80;
+    doc.save();
+    doc.strokeColor('#e2e8f0').lineWidth(0.5).moveTo(40, footerY - 6).lineTo(40 + pageW, footerY - 6).stroke();
+    doc.fillColor('#64748b').font('Helvetica').fontSize(7.5);
+    doc.text(leftText, 40, footerY, { width: pageW / 2, lineBreak: false });
+    doc.text(`Halaman ${i + 1} dari ${range.count}`, 40 + pageW / 2, footerY, {
+      width: pageW / 2,
+      align: 'right',
+      lineBreak: false,
+    });
+    doc.restore();
+  }
+}
+
+// GET /api/summary/export-pdf?date=YYYY-MM-DD&mode=logs|summary|all&workspace=piloting|gereja|testing
 router.get('/export-pdf', async (req, res) => {
   try {
     const workspace = normalizeWorkspace(req.query.workspace);
     const wsLabel = getWorkspacePdfLabel(workspace);
     const dateKey = req.query.date || toLocalDateKey(new Date());
+    const dateLong = formatDateLongID(dateKey);
     const mode = ['logs', 'summary', 'all'].includes(req.query.mode) ? req.query.mode : 'all';
     const summary = await buildDailySummary(dateKey, workspace);
 
@@ -310,9 +354,10 @@ router.get('/export-pdf', async (req, res) => {
       size: 'A4',
       layout: 'landscape',
       margin: 40,
+      bufferPages: true,
       info: {
-        Title: `Laporan ${wsLabel} - ${dateKey}`,
-        Author: 'Mardonius Riel',
+        Title: `Laporan ${wsLabel} - ${dateLong}`,
+        Author: 'Presensi Wajah',
       },
     });
 
@@ -322,14 +367,18 @@ router.get('/export-pdf', async (req, res) => {
     doc.pipe(res);
 
     // Header Banner
-    const pageW = doc.page.width - 80;
+    const pageW = 760;
     doc.save();
-    doc.roundedRect(40, 35, pageW, 54, 6).fill('#1c1917');
-    doc.fillColor('#faf7f2').font('Helvetica-Bold').fontSize(14).text(`MARDONIUS RIEL  |  ${wsLabel}`, 56, 47);
-    doc.fillColor('#d6d3d1').font('Helvetica').fontSize(9.5).text(
-      `Tanggal Laporan: ${dateKey}   |   Dicetak: ${formatDateTimeID(new Date())}`,
+    doc.roundedRect(40, 35, pageW, 56, 6).fill('#1e293b');
+    doc.fillColor('#f8fafc').font('Helvetica-Bold').fontSize(13.5).text(`LAPORAN PRESENSI WAJAH  |  ${wsLabel}`, 56, 47, {
+      width: pageW - 32,
+      lineBreak: false,
+    });
+    doc.fillColor('#cbd5e1').font('Helvetica').fontSize(9).text(
+      `Tanggal Ibadah / Laporan: ${dateLong} (${formatDateSlashID(dateKey)})   |   Pagi: ${summary.morningCount}  •  Sore: ${summary.eveningCount}   |   Dicetak: ${formatDateTimeID(new Date())}`,
       56,
-      68
+      69,
+      { width: pageW - 32, lineBreak: false }
     );
     doc.restore();
 
@@ -340,7 +389,7 @@ router.get('/export-pdf', async (req, res) => {
       { label: 'TOTAL ORANG MASUK', value: String(summary.totalCount), color: '#0284c7' },
       { label: 'TERDAFTAR (MASUK)', value: String(summary.registeredCount), color: '#059669' },
       { label: 'ORANG UNIK HADIR', value: String(summary.uniqueRegisteredCount), color: '#4f46e5' },
-      { label: 'TIDAK TERDAFTAR (BABLAS)', value: String(summary.unregisteredCount), color: '#d97706' },
+      { label: 'TAMU / BELUM TERDAFTAR', value: String(summary.unregisteredCount), color: '#d97706' },
     ];
 
     cards.forEach((c, i) => {
@@ -348,18 +397,18 @@ router.get('/export-pdf', async (req, res) => {
       const cy = 104;
       doc.save();
       doc.roundedRect(cx, cy, cardW, 50, 5).fill('#f8fafc').strokeColor('#cbd5e1').lineWidth(0.8).stroke();
-      doc.fillColor('#475569').font('Helvetica-Bold').fontSize(7.5).text(c.label, cx + 10, cy + 10, { width: cardW - 20 });
-      doc.fillColor(c.color).font('Helvetica-Bold').fontSize(18).text(c.value, cx + 10, cy + 23, { width: cardW - 20 });
+      doc.fillColor('#475569').font('Helvetica-Bold').fontSize(7.5).text(c.label, cx + 10, cy + 10, { width: cardW - 20, lineBreak: false });
+      doc.fillColor(c.color).font('Helvetica-Bold').fontSize(18).text(c.value, cx + 10, cy + 23, { width: cardW - 20, lineBreak: false });
       doc.restore();
     });
 
-    doc.y = 172;
+    doc.y = 170;
 
     if (mode === 'summary' || mode === 'all') {
       doc
         .fillColor('#0f172a')
         .font('Helvetica-Bold')
-        .fontSize(11)
+        .fontSize(10.5)
         .text(
           `Rekap Kehadiran Daftar Anggota (${summary.presentMembersCount} Hadir / ${summary.absentMembersCount} Tidak Hadir)`,
           40,
@@ -367,25 +416,33 @@ router.get('/export-pdf', async (req, res) => {
         );
       doc.moveDown(0.4);
 
-      const memberRows = summary.memberAttendance.map((m, idx) => [
-        idx + 1,
-        m.personName,
-        m.identifier,
-        m.wilayah ? `${m.department} (${m.wilayah})` : m.department,
-        m.date,
-        m.sessionLabel ? `${m.attendanceStatus} (${m.sessionLabel.replace('Gereja ', '')})` : m.attendanceStatus,
-        m.firstEntry ? formatDateTimeID(m.firstEntry).slice(11) : '-',
-        m.confidence !== null ? `${m.confidence}%` : '-',
-      ]);
+      const memberRows = summary.memberAttendance.map((m, idx) => {
+        const shortSession = m.sessionLabel ? m.sessionLabel.replace('Gereja ', '') : '';
+        const statusWithSchedule = m.present
+          ? shortSession
+            ? `Hadir · ${shortSession}${m.sessionTime ? ` (${m.sessionTime})` : ''}`
+            : 'Hadir'
+          : 'Tidak Hadir';
+        return [
+          idx + 1,
+          m.personName,
+          m.identifier,
+          m.wilayah ? `${m.department} (${m.wilayah})` : m.department,
+          formatDateSlashID(m.date),
+          statusWithSchedule,
+          m.firstEntry ? formatDateTimeID(m.firstEntry) : '-',
+          m.confidence !== null ? `${m.confidence}%` : '-',
+        ];
+      });
 
       if (summary.unregisteredCount > 0) {
         memberRows.push([
           memberRows.length + 1,
-          'Tidak Terdaftar (Bablas)',
+          'Tamu / Belum Terdaftar',
           '-',
           'Tamu / Belum Regis',
-          dateKey,
-          `Bablas (${summary.unregisteredCount}x)`,
+          formatDateSlashID(dateKey),
+          `Tercatat (${summary.unregisteredCount}x)`,
           '-',
           '-',
         ]);
@@ -396,8 +453,8 @@ router.get('/export-pdf', async (req, res) => {
         doc.moveDown(1);
       } else {
         drawPdfTable(doc, {
-          headers: ['No', 'Nama Anggota', 'ID / Induk', 'Bagian / Wilayah', 'Tgl Absen', 'Kehadiran & Sesi', 'Jam Masuk', 'Sync DB'],
-          colWidths: [32, 155, 85, 130, 80, 120, 75, 85],
+          headers: ['No', 'Nama Anggota', 'ID / Induk', 'Bagian / Wilayah', 'Tgl Ibadah', 'Status & Jadwal Ibadah', 'Waktu Masuk Aktual', 'Akurasi'],
+          colWidths: [28, 142, 75, 120, 70, 145, 120, 60],
           rows: memberRows,
         });
       }
@@ -408,31 +465,37 @@ router.get('/export-pdf', async (req, res) => {
         doc.addPage();
         doc.y = 40;
       }
-      doc.fillColor('#0f172a').font('Helvetica-Bold').fontSize(11).text(`Detail Log Masuk (${summary.logs.length} entri)`, 40, doc.y);
+      doc.fillColor('#0f172a').font('Helvetica-Bold').fontSize(10.5).text(`Detail Log Masuk Aktual (${summary.logs.length} entri)`, 40, doc.y);
       doc.moveDown(0.4);
 
       if (summary.logs.length === 0) {
         doc.fillColor('#64748b').font('Helvetica').fontSize(9).text('Belum ada log masuk pada tanggal ini.', 40, doc.y);
       } else {
-        const logRows = summary.logs.map((log, idx) => [
-          idx + 1,
-          formatDateTimeID(log.enteredAt),
-          log.personName,
-          log.identifier || '-',
-          log.department || '-',
-          log.status === 'REGISTERED' ? 'Terdaftar' : 'Bablas',
-          log.status === 'REGISTERED' ? `${log.confidence}%` : '-',
-          log.notes || '',
-        ]);
+        const logRows = summary.logs.map((log, idx) => {
+          const logSession = (log.sessionLabel || getChurchSessionLabel(log.sessionTime || log.enteredAt)).replace('Gereja ', '');
+          const jadwalLabel = `${formatDateSlashID(log.dateKey || dateKey)} ${log.sessionTime || ''} (${logSession})`.replace(/\s+/g, ' ').trim();
+          return [
+            idx + 1,
+            formatDateTimeID(log.enteredAt),
+            jadwalLabel,
+            log.personName,
+            log.identifier || '-',
+            log.wilayah ? `${log.department || '-'} (${log.wilayah})` : log.department || '-',
+            log.status === 'REGISTERED' ? 'Terdaftar' : 'Tamu',
+            log.status === 'REGISTERED' ? `${log.confidence}%` : '-',
+            log.notes || '',
+          ];
+        });
 
         drawPdfTable(doc, {
-          headers: ['No', 'Tanggal & Jam', 'Nama', 'ID', 'Divisi', 'Status', 'Sync DB', 'Catatan'],
-          colWidths: [30, 112, 130, 75, 90, 70, 55, 200],
+          headers: ['No', 'Waktu Masuk Aktual', 'Tgl & Jadwal Ibadah', 'Nama', 'ID', 'Bagian / Wilayah', 'Status', 'Akurasi', 'Catatan'],
+          colWidths: [26, 108, 118, 118, 62, 96, 56, 46, 130],
           rows: logRows,
         });
       }
     }
 
+    addPdfFooters(doc, `Presensi Wajah • ${wsLabel} • ${dateLong}`);
     doc.end();
   } catch (err) {
     if (!res.headersSent) {
@@ -596,9 +659,10 @@ router.get('/export-period-pdf', async (req, res) => {
       size: 'A4',
       layout: 'landscape',
       margin: 40,
+      bufferPages: true,
       info: {
         Title: `Rekap Absensi Periode ${wsLabel} (${report.startDate} s/d ${report.endDate})`,
-        Author: 'Mardonius Riel',
+        Author: 'Presensi Wajah',
       },
     });
 
@@ -607,19 +671,24 @@ router.get('/export-period-pdf', async (req, res) => {
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
     doc.pipe(res);
 
-    const pageW = doc.page.width - 80;
+    const pageW = 760;
+    const periodLabel = `${formatDateLongID(report.startDate)} s/d ${formatDateLongID(report.endDate)}`;
     doc.save();
-    doc.roundedRect(40, 35, pageW, 54, 6).fill('#1c1917');
-    doc.fillColor('#faf7f2').font('Helvetica-Bold').fontSize(14).text(`MARDONIUS RIEL  |  REKAP PERIODE (${wsLabel})`, 56, 47);
-    doc.fillColor('#d6d3d1').font('Helvetica').fontSize(9.5).text(
-      `Periode: ${report.startDate} s/d ${report.endDate} (${report.totalDays} hari${report.weekdaysOnly ? ', Senin-Jumat' : ''})   |   Dicetak: ${formatDateTimeID(new Date())}`,
+    doc.roundedRect(40, 35, pageW, 56, 6).fill('#1e293b');
+    doc.fillColor('#f8fafc').font('Helvetica-Bold').fontSize(13.5).text(`REKAP PRESENSI PERIODE  |  ${wsLabel}`, 56, 47, {
+      width: pageW - 32,
+      lineBreak: false,
+    });
+    doc.fillColor('#cbd5e1').font('Helvetica').fontSize(9).text(
+      `Periode: ${periodLabel} (${report.totalDays} hari${report.weekdaysOnly ? ', Senin-Jumat' : ''})   |   Dicetak: ${formatDateTimeID(new Date())}`,
       56,
-      68
+      69,
+      { width: pageW - 32, lineBreak: false }
     );
     doc.restore();
 
     doc.y = 108;
-    doc.fillColor('#0f172a').font('Helvetica-Bold').fontSize(11).text(
+    doc.fillColor('#0f172a').font('Helvetica-Bold').fontSize(10.5).text(
       `Daftar Anggota (${report.totalMembers} orang)`,
       40,
       doc.y
@@ -640,12 +709,13 @@ router.get('/export-period-pdf', async (req, res) => {
         `${m.attendanceRate}%`,
       ]);
       drawPdfTable(doc, {
-        headers: ['No', 'Nama', 'ID / NIM / NIP', 'Divisi', 'Hari Periode', 'Jml Hadir', 'Jml Tidak Hadir', 'Persentase'],
-        colWidths: [32, 185, 100, 130, 80, 75, 90, 70],
+        headers: ['No', 'Nama', 'ID / NIM / NIP', 'Bagian / Divisi', 'Hari Periode', 'Jml Hadir', 'Jml Tidak Hadir', 'Persentase'],
+        colWidths: [30, 185, 100, 130, 80, 75, 90, 70],
         rows,
       });
     }
 
+    addPdfFooters(doc, `Presensi Wajah • ${wsLabel} • ${periodLabel}`);
     doc.end();
   } catch (err) {
     if (!res.headersSent) {

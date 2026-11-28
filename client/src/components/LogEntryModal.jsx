@@ -115,6 +115,7 @@ export default function LogEntryModal({
             confidence: entryType === 'REGISTERED' ? 100 : 0,
             date,
             sessionTime,
+            manualEntry: true,
             oncePerDay: !allowDuplicateSession,
             notes: notes.trim() || 'Input manual oleh admin',
           },

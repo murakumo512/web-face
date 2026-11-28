@@ -23,10 +23,49 @@ export function formatDateTimeID(dateInput) {
   return `${dd}/${mm}/${yyyy} ${hh}:${min}:${ss}`;
 }
 
+const MONTHS_ID = [
+  'Januari',
+  'Februari',
+  'Maret',
+  'April',
+  'Mei',
+  'Juni',
+  'Juli',
+  'Agustus',
+  'September',
+  'Oktober',
+  'November',
+  'Desember',
+];
+
 /**
- * Classify a timestamp into "Gereja Pagi" (< 14:00) or "Gereja Sore" (>= 14:00).
+ * Format YYYY-MM-DD as "27 November 2026".
+ */
+export function formatDateLongID(dateKey = '') {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(dateKey))) return String(dateKey || '-');
+  const [y, m, d] = String(dateKey).split('-').map(Number);
+  return `${d} ${MONTHS_ID[m - 1] || m} ${y}`;
+}
+
+/**
+ * Format YYYY-MM-DD as "27/11/2026".
+ */
+export function formatDateSlashID(dateKey = '') {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(dateKey))) return String(dateKey || '-');
+  const [y, m, d] = String(dateKey).split('-');
+  return `${d}/${m}/${y}`;
+}
+
+/**
+ * Classify a timestamp or HH:mm string into "Gereja Pagi" (< 14:00) or "Gereja Sore" (>= 14:00).
  */
 export function getChurchSessionLabel(dateInput = new Date(), cutoffHour = 14) {
+  if (typeof dateInput === 'string' && /^([01]\d|2[0-3]):[0-5]\d/.test(dateInput.trim())) {
+    const hour = Number.parseInt(dateInput.trim().split(':')[0], 10);
+    if (Number.isFinite(hour)) {
+      return hour < cutoffHour ? 'Gereja Pagi' : 'Gereja Sore';
+    }
+  }
   const d = dateInput instanceof Date ? dateInput : new Date(dateInput);
   return d.getHours() < cutoffHour ? 'Gereja Pagi' : 'Gereja Sore';
 }

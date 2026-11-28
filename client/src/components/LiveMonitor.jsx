@@ -141,7 +141,12 @@ export default function LiveMonitor({
       (sessionLogsData.logs || []).forEach((log) => {
         if (!log.userId) return;
         const logSession = log.sessionLabel || '';
-        if (logSession && logSession !== targetSession) return;
+        const logSessionTime = log.sessionTime || '';
+        if (logSessionTime && sessionTime) {
+          if (logSessionTime !== sessionTime) return;
+        } else if (logSession && logSession !== targetSession) {
+          return;
+        }
         const uid = String(log.userId);
         if (!checkedMap.has(uid) && log.enteredAt) {
           const jam = new Date(log.enteredAt).toLocaleTimeString('id-ID', {
@@ -202,9 +207,10 @@ export default function LiveMonitor({
             snapshotBase64,
             date: sessionDate,
             sessionTime,
+            manualEntry: false,
             oncePerDay: true,
             cooldownSeconds: Math.max(3, Math.floor(cooldownSec / 2)),
-            notes: `Presensi ${wsMeta.shortLabel} (${sessionDate} ${sessionTime} • Sync DB: ${confidence}%)`,
+            notes: `Presensi ${wsMeta.shortLabel} · Jadwal ${sessionTime} (${activeSession}) • Sync DB: ${confidence}%`,
           },
           workspace
         );
@@ -216,9 +222,9 @@ export default function LiveMonitor({
         if (jamStr) checkedInTodayRef.current.set(uid, jamStr);
 
         if (res.alreadyCheckedIn) {
-          showToast('success', `${user.name} sudah presensi (${activeSession}) jam ${jamStr} ✓`);
+          showToast('success', `${user.name} sudah presensi (${activeSession} ${sessionTime}) • Masuk jam ${jamStr} ✓`);
         } else if (!res.skipped) {
-          showToast('success', `Presensi tercatat: ${user.name} (${activeSession} ${jamStr}) • ${confidence}%`);
+          showToast('success', `Presensi tercatat: ${user.name} • Masuk jam ${jamStr} (Jadwal ${sessionTime}) • ${confidence}%`);
           await loadMatcherAndStats();
           onDataChanged?.();
         }
@@ -385,7 +391,7 @@ export default function LiveMonitor({
           if (framesSeen >= 2 && now - lastLoggedAt >= cooldownSec * 1000) {
             userCooldownRef.current.set(uid, now);
             if (alreadyJam) {
-              showToast('success', `${user.name} sudah presensi hari ini jam ${alreadyJam} ✓`);
+              showToast('success', `${user.name} sudah presensi (${getSessionLabelFromTime(sessionTime)} ${sessionTime}) • Masuk jam ${alreadyJam} ✓`);
             } else {
               const snap = captureFaceCropBase64(video, box);
               recordRegisteredEntry(user, confidence, distance, snap);
